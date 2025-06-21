@@ -3,8 +3,10 @@ import { AutocompleteDropdownContextProvider } from 'react-native-autocomplete-d
 import { enableScreens } from 'react-native-screens';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
 
 import ScreenRoutes from './src/Routes'; //Stack screen
+import { toastConfig } from './toastConfig';
 
 enableScreens();
 
@@ -14,6 +16,7 @@ const App = () => {
       <SafeAreaProvider>
         <GestureHandlerRootView style={{ flex: 1 }}>
           <ScreenRoutes />
+          <Toast config={toastConfig} />
         </GestureHandlerRootView>
       </SafeAreaProvider>
     </AutocompleteDropdownContextProvider>

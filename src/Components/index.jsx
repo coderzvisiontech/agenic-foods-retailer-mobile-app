@@ -9,6 +9,8 @@ import CheckboxComp from "./CheckBox";
 import OTPInput from "./OtpInput";
 import PrimaryHeader from "./PrimaryHeader";
 import ProductCard from "./ProductCard"
+import BottomSheet from "./BottomSheet";
+import Toast from "./Toast";
 
 
 export {
@@ -22,5 +24,7 @@ export {
     CheckboxComp,
     OTPInput,
     PrimaryHeader,
-    ProductCard
+    ProductCard,
+    BottomSheet,
+    Toast
 }

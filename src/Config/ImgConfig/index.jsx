@@ -18,6 +18,8 @@ import DecrementIcon from "../../Assets/Icons/decrement_icon.svg"
 import IncrementIcon from "../../Assets/Icons/increment_icon.svg"
 import SearchIcon from "../../Assets/Icons/search_icon.svg"
 import RightIcon from "../../Assets/Icons/right_icon.svg"
+import DeleteIcon from "../../Assets/Icons/delete_icon.svg"
+import ToastIcon from "../../Assets/Icons/toast_logo.svg"
 
 // Home Icon
 const HomeIcon = ({ color = ColorPalatte.grey_300, ...props }) => (
@@ -140,6 +142,8 @@ export {
     IncrementIcon,
     SearchIcon,
     RightIcon,
+    DeleteIcon,
+    ToastIcon,
     HomeIcon,
     CartIcon,
     NotificationIcon,

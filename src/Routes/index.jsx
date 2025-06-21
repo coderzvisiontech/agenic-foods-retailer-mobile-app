@@ -15,29 +15,31 @@ const options = { headerShown: false };
 
 const ScreenRoutes = () => {
     return (
-        <NavigationContainer>
-            <Stack.Navigator
-                initialRouteName="Home"
-                screenOptions={{
-                    headerShown: false,
-                    gestureEnabled: true,
-                    gestureDirection: "horizontal",
-                }}
-            >
-                {/* Auth Screen */}
-                <Stack.Screen name="BottomTab" component={BottomTabNav} options={options} />
-                <Stack.Screen name="Home" component={ProductList} options={options} />
+        <>
+            <NavigationContainer>
+                <Stack.Navigator
+                    initialRouteName="Home"
+                    screenOptions={{
+                        headerShown: false,
+                        gestureEnabled: true,
+                        gestureDirection: "horizontal",
+                    }}
+                >
+                    {/* Auth Screen */}
+                    <Stack.Screen name="BottomTab" component={BottomTabNav} options={options} />
+                    <Stack.Screen name="Home" component={ProductList} options={options} />
 
-                <Stack.Screen name="ConnectScreen" component={ConnectScreen} options={options} />
-                <Stack.Screen name="LoginScreen" component={LoginScreen} options={options} />
-                <Stack.Screen name="RegisterScreen" component={RegisterScreen} options={options} />
-                <Stack.Screen name="OtpScreen" component={OtpScreen} options={options} />
+                    <Stack.Screen name="ConnectScreen" component={ConnectScreen} options={options} />
+                    <Stack.Screen name="LoginScreen" component={LoginScreen} options={options} />
+                    <Stack.Screen name="RegisterScreen" component={RegisterScreen} options={options} />
+                    <Stack.Screen name="OtpScreen" component={OtpScreen} options={options} />
 
-                {/* Success Screen */}
-                <Stack.Screen name="SuccessScreen" component={SuccessScreen} options={options} />
+                    {/* Success Screen */}
+                    <Stack.Screen name="SuccessScreen" component={SuccessScreen} options={options} />
 
-            </Stack.Navigator>
-        </NavigationContainer>
+                </Stack.Navigator>
+            </NavigationContainer>
+        </>
     )
 }
 

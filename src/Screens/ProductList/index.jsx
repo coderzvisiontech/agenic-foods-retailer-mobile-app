@@ -1,9 +1,10 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import { SafeAreaView, StyleSheet, FlatList, View, Alert } from 'react-native';
-import { PrimaryHeader, ProductCard, StatusBarComp, TextInput } from '../../Components';
-import { ColorPalatte } from '../../Themes';
+import { SafeAreaView, StyleSheet, FlatList, View, Alert, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { BottomSheet, ButtonComp, PrimaryHeader, ProductCard, StatusBarComp, TextInput, Typo } from '../../Components';
+import { ColorPalatte } from '../../Themes';
 import AddCart from './Components/AddCart';
+import { showToast } from '../../Utils/Helper/toastHelper';
 
 const initialData = [
     {
@@ -130,31 +131,53 @@ const initialData = [
     },
 ];
 
-const ProductList = () => {
-    const navigation = useNavigation()
-    const [products, setProducts] = useState(initialData);
+const { height } = Dimensions.get('window')
 
-    console.log('products', products)
+const ProductList = () => {
+    const navigation = useNavigation();
+    const [productHome, setProductHome] = useState({
+        products: initialData,
+        pageInfo: {
+            loading: false,
+            bottomSheet: false
+        }
+    });
 
     const handleQuantityChange = useCallback((updatedItem) => {
-        setProducts((prevProducts) =>
-            prevProducts?.map((item) =>
-                item?.id === updatedItem?.id ? updatedItem : item
+        setProductHome(prev => ({
+            ...prev,
+            products: prev.products.map(item =>
+                item.id === updatedItem.id ? updatedItem : item
             )
-        );
+        }));
     }, []);
 
     const cartItems = useMemo(
-        () => products.filter((item) => item.quantity > 0),
-        [products]
+        () => productHome.products.filter(item => item.quantity > 0),
+        [productHome.products]
     );
 
+    const handleDeleteItem = useCallback((itemToDelete) => {
+        setProductHome(prev => ({
+            ...prev,
+            pageInfo: {
+                ...prev.pageInfo,
+                bottomSheet: true
+            }
+        }));
+    }, []);
+
     const renderItem = useCallback(({ item }) => (
-        <ProductCard data={item} onQuantityChange={handleQuantityChange} />
-    ), [handleQuantityChange]);
+        <ProductCard
+            data={item}
+            isDelete
+            onQuantityChange={handleQuantityChange}
+            onDelete={handleDeleteItem}
+        />
+    ), [handleQuantityChange, handleDeleteItem]);
 
     const handleCheckout = useCallback(() => {
-        const cartPayload = cartItems.map((item) => ({
+        const cartPayload = cartItems.map(item => ({
             product_id: item.id,
             quantity: item.quantity,
         }));
@@ -180,6 +203,13 @@ const ProductList = () => {
         );
     }, [cartItems, handleCheckout]);
 
+    const handleDelete = () => {
+        setProductHome((prev) => ({
+            ...prev,
+            pageInfo: { ...prev.pageInfo, bottomSheet: false }
+        }))
+        showToast('error', 'Data saved successfully!');
+    }
 
     return (
         <SafeAreaView style={styles.container}>
@@ -190,7 +220,7 @@ const ProductList = () => {
             <PrimaryHeader
                 isNotification={true}
                 isCart={true}
-                cartCount={3}
+                cartCount={cartItems.length}
                 notifyCount={4}
                 onNotifyPress={() => navigation.navigate("BottomTab", { screen: 'Notification' })}
                 onCartPress={() => navigation.navigate("BottomTab", { screen: 'Cart' })}
@@ -202,16 +232,40 @@ const ProductList = () => {
                     placeholder='Search'
                 />
                 <FlatList
-                    data={products}
+                    data={productHome.products}
                     keyExtractor={(item) => item.id}
                     renderItem={renderItem}
                     showsVerticalScrollIndicator={false}
                     contentContainerStyle={{ paddingBottom: 60 }}
-
                 />
             </View>
-            {cartItems?.length > 0 && (
-                renderAddCart()
+
+            {renderAddCart()}
+
+            {productHome?.pageInfo?.bottomSheet && (
+                <BottomSheet
+                    visible={productHome?.pageInfo?.bottomSheet}
+                    onClose={() => setProductHome((prev) => ({
+                        ...prev,
+                        pageInfo: { ...prev.pageInfo, bottomSheet: false }
+                    }))}
+                    height={height * 0.3}
+                >
+                    <Typo type='h3' title='Delete' />
+                    <View style={{ gap: 15 }}>
+                        <Typo type='p' title='Are you sure you want to delete Onion from cart?' />
+                        <ButtonComp
+                            type='largePrimary'
+                            title='Delete'
+                            onPress={handleDelete}
+                        />
+                        <ButtonComp
+                            type='largeSecondary'
+                            title='Cancel'
+                            onPress={() => Alert.alert('Cancelled')}
+                        />
+                    </View>
+                </BottomSheet>
             )}
         </SafeAreaView>
     );
