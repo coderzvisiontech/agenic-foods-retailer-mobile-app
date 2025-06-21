@@ -11,7 +11,7 @@ const ProductCard = ({ data, onQuantityChange }) => {
         unit,
         items_left,
         image,
-        quantity = 1,
+        quantity = 0,
     } = data;
 
     const [qty, setQty] = useState(quantity);
@@ -22,7 +22,7 @@ const ProductCard = ({ data, onQuantityChange }) => {
     };
 
     const decreaseQty = () => {
-        setQty(prev => (prev > 1 ? prev - 1 : 1));
+        setQty(prev => (prev > 1 ? prev - 1 : 0));
     };
 
     useEffect(() => {
@@ -43,17 +43,16 @@ const ProductCard = ({ data, onQuantityChange }) => {
         };
     }, []);
 
-    const totalPrice = price * qty;
+    const totalPrice = qty === 0 ? price : price * qty;
 
     return (
         <View style={styles.card}>
-            {console.log('image', image)}
             <Image
                 source={
                     // image
                     //     ? { uri: image }
                     //     : 
-                        require('../../Assets/Images/otp_bg.jpg')
+                    require('../../Assets/Images/otp_bg.jpg')
                 }
                 style={styles.image}
                 resizeMode="cover"

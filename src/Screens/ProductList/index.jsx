@@ -1,8 +1,9 @@
-import React, { useState, useCallback } from 'react';
-import { SafeAreaView, StyleSheet, FlatList, View } from 'react-native';
+import React, { useState, useCallback, useMemo } from 'react';
+import { SafeAreaView, StyleSheet, FlatList, View, Alert } from 'react-native';
 import { PrimaryHeader, ProductCard, StatusBarComp, TextInput } from '../../Components';
 import { ColorPalatte } from '../../Themes';
 import { useNavigation } from '@react-navigation/native';
+import AddCart from './Components/AddCart';
 
 const initialData = [
     {
@@ -12,7 +13,6 @@ const initialData = [
         unit: "kg",
         items_left: 10,
         image: "https://placehold.co/600x400?text=Onions",
-        quantity: 0,
     },
     {
         id: '2',
@@ -21,7 +21,7 @@ const initialData = [
         unit: "kg",
         items_left: 210,
         image: "https://placehold.co/600x400?text=Tomatoes",
-        quantity: 2,
+
     },
     {
         id: '3',
@@ -30,7 +30,6 @@ const initialData = [
         unit: "kg",
         items_left: 15,
         image: "https://placehold.co/600x400?text=Oranges",
-        quantity: 2,
     },
     {
         id: '4',
@@ -39,7 +38,6 @@ const initialData = [
         unit: "kg",
         items_left: 50,
         image: "https://placehold.co/600x400?text=Potatoes",
-        quantity: 1,
     },
     {
         id: '5',
@@ -48,7 +46,7 @@ const initialData = [
         unit: "kg",
         items_left: 30,
         image: "https://placehold.co/600x400?text=Carrots",
-        quantity: 1,
+
     },
     {
         id: '6',
@@ -57,7 +55,6 @@ const initialData = [
         unit: "kg",
         items_left: 18,
         image: "https://placehold.co/600x400?text=Cabbage",
-        quantity: 1,
     },
     {
         id: '7',
@@ -66,7 +63,6 @@ const initialData = [
         unit: "kg",
         items_left: 25,
         image: "https://placehold.co/600x400?text=Spinach",
-        quantity: 1,
     },
     {
         id: '8',
@@ -75,7 +71,6 @@ const initialData = [
         unit: "kg",
         items_left: 14,
         image: "https://placehold.co/600x400?text=Beetroot",
-        quantity: 1,
     },
     {
         id: '9',
@@ -84,7 +79,6 @@ const initialData = [
         unit: "kg",
         items_left: 8,
         image: "https://placehold.co/600x400?text=Pumpkin",
-        quantity: 1,
     },
     {
         id: '10',
@@ -93,7 +87,6 @@ const initialData = [
         unit: "kg",
         items_left: 19,
         image: "https://placehold.co/600x400?text=Brinjal",
-        quantity: 1,
     },
     {
         id: '11',
@@ -102,7 +95,6 @@ const initialData = [
         unit: "kg",
         items_left: 22,
         image: "https://placehold.co/600x400?text=Cucumber",
-        quantity: 1,
     },
     {
         id: '12',
@@ -111,7 +103,6 @@ const initialData = [
         unit: "kg",
         items_left: 16,
         image: "https://placehold.co/600x400?text=Cauliflower",
-        quantity: 1,
     },
     {
         id: '13',
@@ -120,7 +111,6 @@ const initialData = [
         unit: "kg",
         items_left: 12,
         image: "https://placehold.co/600x400?text=Capsicum",
-        quantity: 1,
     },
     {
         id: '14',
@@ -129,7 +119,6 @@ const initialData = [
         unit: "kg",
         items_left: 20,
         image: "https://placehold.co/600x400?text=Green+Beans",
-        quantity: 1,
     },
     {
         id: '15',
@@ -138,7 +127,6 @@ const initialData = [
         unit: "kg",
         items_left: 7,
         image: "https://placehold.co/600x400?text=Mushrooms",
-        quantity: 1,
     },
 ];
 
@@ -146,17 +134,52 @@ const ProductList = () => {
     const navigation = useNavigation()
     const [products, setProducts] = useState(initialData);
 
+    console.log('products', products)
+
     const handleQuantityChange = useCallback((updatedItem) => {
         setProducts((prevProducts) =>
-            prevProducts.map((item) =>
-                item.id === updatedItem.id ? updatedItem : item
+            prevProducts?.map((item) =>
+                item?.id === updatedItem?.id ? updatedItem : item
             )
         );
     }, []);
 
+    const cartItems = useMemo(
+        () => products.filter((item) => item.quantity > 0),
+        [products]
+    );
+
     const renderItem = useCallback(({ item }) => (
         <ProductCard data={item} onQuantityChange={handleQuantityChange} />
     ), [handleQuantityChange]);
+
+    const handleCheckout = useCallback(() => {
+        const cartPayload = cartItems.map((item) => ({
+            product_id: item.id,
+            quantity: item.quantity,
+        }));
+
+        if (cartPayload.length === 0) {
+            Alert.alert("Cart is empty", "Please add items before checkout.");
+            return;
+        }
+
+        console.log('cartPayload', cartPayload);
+        Alert.alert("Success", "Order placed successfully!");
+        navigation.navigate('BottomTab', { screen: 'Cart' });
+    }, [cartItems, navigation]);
+
+    const renderAddCart = useCallback(() => {
+        if (cartItems.length === 0) return null;
+
+        return (
+            <AddCart
+                items={cartItems}
+                onViewCart={handleCheckout}
+            />
+        );
+    }, [cartItems, handleCheckout]);
+
 
     return (
         <SafeAreaView style={styles.container}>
@@ -187,6 +210,9 @@ const ProductList = () => {
 
                 />
             </View>
+            {cartItems?.length > 0 && (
+                renderAddCart()
+            )}
         </SafeAreaView>
     );
 };
