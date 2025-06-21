@@ -13,7 +13,7 @@ const SecondaryHeader = ({ isBack, screenName, onPressBack }) => {
             )}
 
             {screenName && (
-                <Typo type='h5' title={screenName} />
+                <Typo type='h3' title={screenName} />
             )}
         </View>
     )

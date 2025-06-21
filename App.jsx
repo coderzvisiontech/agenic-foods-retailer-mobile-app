@@ -3,10 +3,12 @@ import { AutocompleteDropdownContextProvider } from 'react-native-autocomplete-d
 import { enableScreens } from 'react-native-screens';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { Provider } from 'react-redux';
 import Toast from 'react-native-toast-message';
 
 import ScreenRoutes from './src/Routes'; //Stack screen
 import { toastConfig } from './toastConfig';
+import { store } from './src/Redux/Store/store';
 
 enableScreens();
 
@@ -14,10 +16,12 @@ const App = () => {
   return (
     <AutocompleteDropdownContextProvider>
       <SafeAreaProvider>
-        <GestureHandlerRootView style={{ flex: 1 }}>
-          <ScreenRoutes />
-          <Toast config={toastConfig} />
-        </GestureHandlerRootView>
+        <Provider store={store}>
+          <GestureHandlerRootView style={{ flex: 1 }}>
+            <ScreenRoutes />
+            <Toast config={toastConfig} />
+          </GestureHandlerRootView>
+        </Provider>
       </SafeAreaProvider>
     </AutocompleteDropdownContextProvider>
   )

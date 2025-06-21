@@ -8,7 +8,6 @@ import BottomTabNav from './Components/BottomTabNav';
 //Screens
 import { ConnectScreen, LoginScreen, RegisterScreen, OtpScreen } from '../Screens/Auth';
 import SuccessScreen from '../Screens/SuccessScreen';
-import ProductList from '../Screens/ProductList';
 
 const Stack = createNativeStackNavigator();
 const options = { headerShown: false };
@@ -18,7 +17,7 @@ const ScreenRoutes = () => {
         <>
             <NavigationContainer>
                 <Stack.Navigator
-                    initialRouteName="Home"
+                    initialRouteName="ConnectScreen"
                     screenOptions={{
                         headerShown: false,
                         gestureEnabled: true,
@@ -27,8 +26,6 @@ const ScreenRoutes = () => {
                 >
                     {/* Auth Screen */}
                     <Stack.Screen name="BottomTab" component={BottomTabNav} options={options} />
-                    <Stack.Screen name="Home" component={ProductList} options={options} />
-
                     <Stack.Screen name="ConnectScreen" component={ConnectScreen} options={options} />
                     <Stack.Screen name="LoginScreen" component={LoginScreen} options={options} />
                     <Stack.Screen name="RegisterScreen" component={RegisterScreen} options={options} />

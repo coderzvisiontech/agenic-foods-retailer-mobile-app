@@ -11,7 +11,6 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useFormik } from 'formik';
-import * as Yup from 'yup';
 
 import {
     ButtonComp,
@@ -21,26 +20,33 @@ import {
 } from '../../../Components';
 import { ColorPalatte } from '../../../Themes';
 import { RegisterSchema } from '../../../Utils/ValidationSchema';
+import { useDispatch } from 'react-redux';
+import { authSignup } from '../../../Redux/Action/Auth';
 
-
-
-const RegisterScreen = () => {
+const RegisterScreen = ({ route }) => {
+    const { phone_number } = route.params;
     const navigation = useNavigation();
+    const dispatch = useDispatch();
 
     const formik = useFormik({
         initialValues: {
             firstName: '',
             lastName: '',
             email: '',
-            mobile: '',
+            mobile: phone_number,
             address: '',
             document: '',
             shopImage: ''
         },
-        // validationSchema: RegisterSchema,
+        validationSchema: RegisterSchema,
         onSubmit: (values) => {
             console.log('Form values:', values);
-            navigation.navigate('OtpScreen', { phone: '98834983782' })
+            // navigation.navigate('OtpScreen', { phone: '98834983782' })
+            const payload = {
+
+            }
+            dispatch(authSignup(values))
+
         },
     });
 
@@ -141,6 +147,7 @@ const styles = StyleSheet.create({
         backgroundColor: ColorPalatte.whiteClr,
         flex: 1,
         paddingHorizontal: 20,
+        paddingTop: 24
     },
     scrollContent: {
         paddingBottom: 20,

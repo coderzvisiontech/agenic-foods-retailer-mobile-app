@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
     View,
     KeyboardAvoidingView,
@@ -22,11 +22,20 @@ import {
 import { LoginSchema } from '../../../Utils/ValidationSchema';
 import { ColorPalatte } from '../../../Themes';
 import { VegetableImg } from '../../../Config/ImgConfig';
+import { useDispatch } from 'react-redux';
+import { authLogin } from '../../../Redux/Action/Auth';
+import { showToast } from '../../../Utils/Helper/toastHelper';
 
 const { height, width } = Dimensions.get('window');
 
 const LoginScreen = () => {
     const navigation = useNavigation();
+    const dispatch = useDispatch()
+    const [loginData, setLoginData] = useState({
+        infoState: {
+            loading: false
+        }
+    })
 
     const formik = useFormik({
         initialValues: {
@@ -35,7 +44,29 @@ const LoginScreen = () => {
         validationSchema: LoginSchema,
         onSubmit: (values) => {
             console.log('Form values:', values);
-            navigation.navigate("RegisterScreen")
+            setLoginData((prev) => ({
+                ...prev,
+                infoState: { loading: true }
+            }))
+            dispatch(authLogin({ phone: { code: "91", number: values.phone } })).then((res) => {
+                console.log('res', res)
+                if (res?.payload?.data?.status === 0) {
+                    setLoginData((prev) => ({
+                        ...prev,
+                        infoState: { loading: false }
+                    }))
+                    showToast('success', 'Please register to login');
+                    setTimeout(() => {
+                        navigation.navigate("RegisterScreen", { phone_number: values.phone })
+                    }, 1500)
+                } else {
+                    setLoginData((prev) => ({
+                        ...prev,
+                        infoState: { loading: false }
+                    }))
+                    showToast('error', 'Something went wrong');
+                }
+            })
 
         },
     });
@@ -61,8 +92,9 @@ const LoginScreen = () => {
                                     height={height}
                                 />
                             }
+                            alignBg
                         >
-                            <View style={{ justifyContent: "space-between", maxHeight: 275, flex: 1 }}>
+                            <View style={{ justifyContent: "space-between", height: 275, flex: 1 }}>
 
                                 <View style={{ alignItems: 'center', paddingVertical: 20 }}>
                                     <Typo type='h2' title='Welcome to Get Fresh' />
@@ -86,6 +118,7 @@ const LoginScreen = () => {
                                     title="Log In"
                                     type="largePrimary"
                                     onPress={formik.handleSubmit}
+                                    disable={loginData?.loading}
                                 />
                             </View>
                         </BackgroundWrapper>
