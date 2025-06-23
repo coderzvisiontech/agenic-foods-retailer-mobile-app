@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
     View,
     KeyboardAvoidingView,
@@ -22,31 +22,92 @@ import { ColorPalatte } from '../../../Themes';
 import { RegisterSchema } from '../../../Utils/ValidationSchema';
 import { useDispatch } from 'react-redux';
 import { authSignup } from '../../../Redux/Action/Auth';
+import { showToast } from '../../../Utils/Helper/toastHelper';
 
 const RegisterScreen = ({ route }) => {
     const { phone_number } = route.params;
     const navigation = useNavigation();
     const dispatch = useDispatch();
 
+    const [registerData, setRegisterData] = useState({
+        infoState: {
+            loading: false
+        }
+    })
+
     const formik = useFormik({
         initialValues: {
-            firstName: '',
-            lastName: '',
+            first_name: '',
+            last_name: '',
+            code: "",
             email: '',
-            mobile: phone_number,
+            number: phone_number,
+            shop_name: '',
             address: '',
-            document: '',
-            shopImage: ''
+            document: '', //file1
+            shop_images: '', //file2
+            lng: '',
+            lat: "",
         },
         validationSchema: RegisterSchema,
         onSubmit: (values) => {
-            console.log('Form values:', values);
-            // navigation.navigate('OtpScreen', { phone: '98834983782' })
             const payload = {
-
+                first_name: values?.first_name,
+                last_name: values?.last_name,
+                email: values?.email,
+                code: '91',
+                number: values?.number,
+                shop_name: values?.shop_name,
+                line1: '6th avenue',
+                line2: 'Anna nagar',
+                city: 'Chennai',
+                state: 'Tamil Nadu',
+                zipcode: '600040',
+                country: 'India',
+                lat: '12.989',
+                lng: '8.9787',
+                file1: values?.document,
+                file2: values?.shop_images,
             }
-            dispatch(authSignup(values))
+            setRegisterData((prev) => ({
+                ...prev,
+                infoState: { loading: true }
+            }))
+            console.log('payload', payload)
+            dispatch(authSignup(payload)).then((res) => {
+                console.log('res', res)
+                if (res?.payload?.data?.status) {
+                    showToast('success', 'Registration Successfull');
+                    setRegisterData((prev) => ({
+                        ...prev,
+                        infoState: { loading: false }
+                    }))
+                    setTimeout(() => {
+                        navigation.navigate('SuccessScreen', {
+                            message: 'Successfully Created a Account',
+                            screenRoute: {
+                                routeName: 'BottomTab',
+                                params: { screen: 'loginScreen' }
+                            }
+                        });
 
+                    }, 1500)
+                } else if (res?.payload?.data?.isExist) {
+                    showToast('error', res?.payload?.data?.message);
+                    setRegisterData((prev) => ({
+                        ...prev,
+                        infoState: { loading: false }
+                    }))
+                }
+                else {
+                    console.log('else part')
+                    setRegisterData((prev) => ({
+                        ...prev,
+                        infoState: { loading: false }
+                    }))
+                    showToast('error', 'Registration Failed');
+                }
+            })
         },
     });
 
@@ -64,19 +125,19 @@ const RegisterScreen = ({ route }) => {
                             <TextInput
                                 label="First Name"
                                 placeholder="Enter First Name"
-                                onChangeText={formik.handleChange('firstName')}
-                                onBlur={formik.handleBlur('firstName')}
-                                value={formik.values.firstName}
-                                error={formik.touched.firstName && formik.errors.firstName}
+                                onChangeText={formik.handleChange('first_name')}
+                                onBlur={formik.handleBlur('first_name')}
+                                value={formik.values.first_name}
+                                error={formik.touched.first_name && formik.errors.first_name}
                                 isMandatory
                             />
                             <TextInput
                                 label="Last Name"
                                 placeholder="Enter Last Name"
-                                onChangeText={formik.handleChange('lastName')}
-                                onBlur={formik.handleBlur('lastName')}
-                                value={formik.values.lastName}
-                                error={formik.touched.lastName && formik.errors.lastName}
+                                onChangeText={formik.handleChange('last_name')}
+                                onBlur={formik.handleBlur('last_name')}
+                                value={formik.values.last_name}
+                                error={formik.touched.last_name && formik.errors.last_name}
                                 isMandatory
                             />
                             <TextInput
@@ -90,14 +151,23 @@ const RegisterScreen = ({ route }) => {
                                 isMandatory
                             />
                             <TextInput
-                                label="Mobile Number"
-                                placeholder="Enter Mobile Number"
+                                label="Shop Name"
+                                placeholder="Enter Shop Name"
+                                onChangeText={formik.handleChange('shop_name')}
+                                onBlur={formik.handleBlur('shop_name')}
+                                value={formik.values.shop_name}
+                                error={formik.touched.shop_name && formik.errors.shop_name}
+                                isMandatory
+                            />
+                            <TextInput
+                                label="number Number"
+                                placeholder="Enter number Number"
                                 keyboardType="phone-pad"
-                                onChangeText={formik.handleChange('mobile')}
-                                onBlur={formik.handleBlur('mobile')}
-                                value={formik.values.mobile}
+                                onChangeText={formik.handleChange('number')}
+                                onBlur={formik.handleBlur('number')}
+                                value={formik.values.number}
                                 type='phonenumber'
-                                error={formik.touched.mobile && formik.errors.mobile}
+                                error={formik.touched.number && formik.errors.number}
                                 isMandatory
                             />
                             <TextInput
@@ -109,7 +179,6 @@ const RegisterScreen = ({ route }) => {
                                 error={formik.touched.address && formik.errors.address}
                                 isMandatory
                             />
-                            {console.log('------>', formik.values.document)}
                             <TextInput
                                 label="Upload a Document"
                                 placeholder="Choose a file"
@@ -124,8 +193,8 @@ const RegisterScreen = ({ route }) => {
                                 label="Upload a Shop Image"
                                 type="upload"
                                 placeholder="Upload Shop Image"
-                                onChangeText={(uri) => formik.setFieldValue('shopImage', uri)}
-                                value={formik.values.shopImage}
+                                onChangeText={(uri) => formik.setFieldValue('shop_images', uri)}
+                                value={formik.values.shop_images}
                                 selectionLimit={5}
                             />
 

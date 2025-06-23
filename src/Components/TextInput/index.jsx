@@ -40,7 +40,7 @@ const TextInputComp = ({
             console.log('response------->', response)
             if (response.assets && response.assets.length > 0) {
                 const image = response.assets[0];
-                onChangeText(image.uri);
+                onChangeText(image);
             }
         });
     };
@@ -133,7 +133,7 @@ const TextInputComp = ({
                                 }}
                                 numberOfLines={1}
                             >
-                                {value ? value.split('/').pop() : placeholder}
+                                {value?.fileName || value?.name || placeholder}
                             </Text>
                         </View>
                         {value?.length > 0 && (

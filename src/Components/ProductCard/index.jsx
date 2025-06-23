@@ -134,11 +134,12 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { VITE_UPLOAD_IMG } from "@env"
 import { Typo, BottomSheet } from "../../Components"
 import { ColorPalatte } from '../../Themes';
 import { DecrementIcon, DeleteIcon, IncrementIcon } from '../../Config/ImgConfig';
 
-const ProductCard = ({ data, onQuantityChange, isDelete, onDelete }) => {
+const ProductCard = ({ data, onQuantityChange, isDelete, onDelete, tailWidth, ellipsis }) => {
     const {
         name,
         price,
@@ -146,6 +147,7 @@ const ProductCard = ({ data, onQuantityChange, isDelete, onDelete }) => {
         items_left,
         image,
         quantity = 0,
+        mult_images
     } = data;
 
     const [qty, setQty] = useState(quantity);
@@ -183,10 +185,7 @@ const ProductCard = ({ data, onQuantityChange, isDelete, onDelete }) => {
         <View style={styles.card}>
             <Image
                 source={
-                    // image
-                    //     ? { uri: image }
-                    //     : 
-                    require('../../Assets/Images/otp_bg.jpg')
+                    image ? { uri: `${VITE_UPLOAD_IMG}${image}` } : require('../../Assets/Images/otp_bg.jpg')
                 }
                 style={styles.image}
                 resizeMode="cover"
@@ -202,7 +201,10 @@ const ProductCard = ({ data, onQuantityChange, isDelete, onDelete }) => {
                     justifyContent: 'space-between',
                     alignItems: 'center'
                 }}>
-                    <Typo type='h5' title={name} />
+                    <Typo tailWidth={tailWidth} ellipsis={ellipsis} type='h5' title={name}
+                    />
+                    {/* <Typo type='h5' title={name} /> */}
+
                     {isDelete && (
                         <TouchableOpacity onPress={() => onDelete?.(data)}>
                             <DeleteIcon />
@@ -259,7 +261,7 @@ const styles = StyleSheet.create({
     },
     image: {
         width: 80,
-        height: 80,
+        height: 100,
         borderRadius: 8,
     },
     counter: {

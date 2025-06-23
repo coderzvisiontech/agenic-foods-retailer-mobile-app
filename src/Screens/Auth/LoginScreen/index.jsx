@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     View,
     KeyboardAvoidingView,
@@ -25,6 +25,7 @@ import { VegetableImg } from '../../../Config/ImgConfig';
 import { useDispatch } from 'react-redux';
 import { authLogin } from '../../../Redux/Action/Auth';
 import { showToast } from '../../../Utils/Helper/toastHelper';
+import { getAuthToken } from '../../../Utils/Helper/checkAuth';
 
 const { height, width } = Dimensions.get('window');
 
@@ -37,6 +38,19 @@ const LoginScreen = () => {
         }
     })
 
+    useEffect(() => {
+        const checkUser = async () => {
+            const user = await getAuthToken();
+            if (user) {
+                navigation.navigate('BottomTab', { Screen: 'Home' })
+            } else {
+                console.log('No token');
+            }
+        };
+        checkUser();
+    }, []);
+
+
     const formik = useFormik({
         initialValues: {
             phone: ''
@@ -44,11 +58,12 @@ const LoginScreen = () => {
         validationSchema: LoginSchema,
         onSubmit: (values) => {
             console.log('Form values:', values);
+            Keyboard.dismiss()
             setLoginData((prev) => ({
                 ...prev,
                 infoState: { loading: true }
             }))
-            dispatch(authLogin({ phone: { code: "91", number: values.phone } })).then((res) => {
+            dispatch(authLogin({ phone: { code: "91", number: values?.phone } })).then((res) => {
                 console.log('res', res)
                 if (res?.payload?.data?.status === 0) {
                     setLoginData((prev) => ({
@@ -57,9 +72,19 @@ const LoginScreen = () => {
                     }))
                     showToast('success', 'Please register to login');
                     setTimeout(() => {
-                        navigation.navigate("RegisterScreen", { phone_number: values.phone })
+                        navigation.navigate("RegisterScreen", { phone_number: values?.phone })
                     }, 1500)
-                } else {
+                } else if (res?.payload?.data?.status === 1) {
+                    setLoginData((prev) => ({
+                        ...prev,
+                        infoState: { loading: false }
+                    }))
+                    showToast('success', 'OTP Sent Successfully');
+                    setTimeout(() => {
+                        navigation.navigate("OtpScreen", { phone: values?.phone })
+                    }, 1500)
+                }
+                else {
                     setLoginData((prev) => ({
                         ...prev,
                         infoState: { loading: false }

@@ -9,9 +9,11 @@ export const ColorPalatte = {
 
     primaryClr: '#429539', //green
     secondaryClr: '#F37421', //orange
+    disableClr: '#EDEDED', //disable
 
     primartTxt: '#282828', //primary text
     secondaryTxt: '#484848',//secondary text
+    disableTxt: '#C5C5C5',//disable text
 
     //Grey Foundation Color
     grey_100: '#C6C6C6',
@@ -20,6 +22,7 @@ export const ColorPalatte = {
 
     // Primary Foundation Color
     primaryClr_50: '#ECF4EB',
+    primaryClr_100: '#C4DEC2'
 
 
 }

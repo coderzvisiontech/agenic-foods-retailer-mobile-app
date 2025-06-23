@@ -1,20 +1,10 @@
-// src/store/store.js
 import { configureStore } from '@reduxjs/toolkit';
-
-// Dummy slice reducer
-const dummyReducer = (state = { value: 0 }, action) => {
-  switch (action.type) {
-    case 'INCREMENT':
-      return { ...state, value: state.value + 1 };
-    case 'DECREMENT':
-      return { ...state, value: state.value - 1 };
-    default:
-      return state;
-  }
-};
+import productReducer from '../Slice/productSlice';
+import profileReducer from '../Slice/profileSlice';
 
 export const store = configureStore({
   reducer: {
-    dummy: dummyReducer,
+    product: productReducer, //product list
+    profile: profileReducer, //user profile
   },
 });

@@ -53,3 +53,55 @@ export const authSignup = createAsyncThunk(
         }
     }
 );
+
+export const authOtpVerify = createAsyncThunk(
+    "getfresh/otp-verify",
+    async (dataObject, { rejectWithValue }) => {
+
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        }
+
+        try {
+            const response = await axios.post(`${VITE_API_URL}/auth/verify-otp`, dataObject, config);
+            return response;
+        } catch (error) {
+            console.log('error', error)
+            if (error?.response && error?.response?.data) {
+                return rejectWithValue(error?.response?.data);
+            } else {
+                return rejectWithValue({
+                    message: error,
+                });
+            }
+        }
+    }
+);
+
+export const authLogout = createAsyncThunk(
+    "getfresh/logout",
+    async (dataObject, { rejectWithValue }) => {
+
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        }
+
+        try {
+            const response = await axios.delete(`${VITE_API_URL}/auth/logout`, dataObject, config);
+            return response;
+        } catch (error) {
+            console.log('error', error)
+            if (error?.response && error?.response?.data) {
+                return rejectWithValue(error?.response?.data);
+            } else {
+                return rejectWithValue({
+                    message: error,
+                });
+            }
+        }
+    }
+);

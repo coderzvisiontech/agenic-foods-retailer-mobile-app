@@ -1,4 +1,4 @@
-import { HomeIcon, NotificationIcon, CartIcon, ProfileIcon } from "../Config/ImgConfig";
+import { HomeIcon, NotificationIcon, CartIcon, ProfileIcon, UserIcon, OrderIcon, CreditIcon, SupportIcon, LogoutIcon } from "../Config/ImgConfig";
 import { ColorPalatte } from "../Themes";
 
 export const FOOTER_MENU = [
@@ -27,4 +27,27 @@ export const FOOTER_MENU = [
         activeIcon: <ProfileIcon color={ColorPalatte.primaryClr} />,
     }
 
+]
+
+export const PROFILE_MENU = [
+    {
+        key: 'orders',
+        name: 'Orders',
+        icon: <OrderIcon />
+    },
+    {
+        key: "credit_points",
+        name: "Credit Points",
+        icon: <CreditIcon />
+    },
+    {
+        key: 'support',
+        name: 'Customer Support',
+        icon: <SupportIcon />
+    },
+    {
+        key: 'logout',
+        name: 'Logout',
+        icon: <LogoutIcon />
+    }
 ]

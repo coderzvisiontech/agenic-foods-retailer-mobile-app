@@ -1,14 +1,54 @@
-import React from 'react';
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { Animated, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { ColorPalatte } from '../../../../Themes';
 import { Typo } from '../../../../Components';
-import { RightIcon } from '../../../../Config/ImgConfig';
+// import { RightIcon } from '../../../../Config/ImgConfig';
 
 const AddCart = ({ items = [], onViewCart }) => {
+    const translateY = useRef(new Animated.Value(100)).current;
+    const opacity = useRef(new Animated.Value(0)).current;
+
+    useEffect(() => {
+        if (items?.length > 0) {
+            Animated.parallel([
+                Animated.spring(translateY, {
+                    toValue: 0,
+                    useNativeDriver: true,
+                }),
+                Animated.timing(opacity, {
+                    toValue: 1,
+                    duration: 250,
+                    useNativeDriver: true,
+                }),
+            ]).start();
+        } else {
+            Animated.parallel([
+                Animated.timing(translateY, {
+                    toValue: 100,
+                    duration: 200,
+                    useNativeDriver: true,
+                }),
+                Animated.timing(opacity, {
+                    toValue: 0,
+                    duration: 150,
+                    useNativeDriver: true,
+                }),
+            ]).start();
+        }
+    }, [items?.length]);
+
     const totalAmount = items?.reduce((sum, item) => sum + item?.price * item?.quantity, 0);
 
     return (
-        <View style={styles.container}>
+        <Animated.View
+            style={[
+                styles.container,
+                {
+                    transform: [{ translateY }],
+                    opacity,
+                },
+            ]}
+        >
             <View>
                 <Typo title={`Total ${items.length} item${items.length > 1 ? 's' : ''}`} />
                 <Typo type='h3' title={`₹${totalAmount.toFixed(2)}`} />
@@ -20,15 +60,16 @@ const AddCart = ({ items = [], onViewCart }) => {
                     {/* <RightIcon /> */}
                 </View>
             </TouchableOpacity>
-        </View>
+        </Animated.View>
     );
 };
+
 
 const styles = StyleSheet.create({
     container: {
         backgroundColor: ColorPalatte.whiteClr,
         position: 'absolute',
-        bottom: 10,
+        bottom: 75,
         left: 20,
         right: 20,
         height: 81,
@@ -39,10 +80,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
 
         shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 4,
-        },
+        shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.1,
         shadowRadius: 6,
         elevation: 6,
@@ -60,4 +98,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default AddCart;
+export default AddCart

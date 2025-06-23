@@ -8,6 +8,8 @@ import BottomTabNav from './Components/BottomTabNav';
 //Screens
 import { ConnectScreen, LoginScreen, RegisterScreen, OtpScreen } from '../Screens/Auth';
 import SuccessScreen from '../Screens/SuccessScreen';
+import { DetailScreen } from '../Screens/Profile/Component';
+import OrderDeatils from '../Screens/Order';
 
 const Stack = createNativeStackNavigator();
 const options = { headerShown: false };
@@ -33,6 +35,12 @@ const ScreenRoutes = () => {
 
                     {/* Success Screen */}
                     <Stack.Screen name="SuccessScreen" component={SuccessScreen} options={options} />
+
+                    {/* Profile Screen */}
+                    <Stack.Screen name='ProfileDetail' component={DetailScreen} options={options} />
+
+                    {/* Order Screen */}
+                    <Stack.Screen name='OrderDeatils' component={OrderDeatils} options={options} />
 
                 </Stack.Navigator>
             </NavigationContainer>

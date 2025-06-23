@@ -5,7 +5,8 @@ import { SuccessIcon } from '../../Config/ImgConfig'
 import { Typo } from '../../Components'
 import { ColorPalatte } from '../../Themes'
 
-const SuccessScreen = () => {
+const SuccessScreen = ({ route }) => {
+    const { message, screenRoute, screen } = route.params
     const fadeAnim = useRef(new Animated.Value(0)).current;
     const navigation = useNavigation();
 
@@ -16,9 +17,11 @@ const SuccessScreen = () => {
             useNativeDriver: true,
         }).start(() => {
             setTimeout(() => {
-                navigation.navigate('BottomTab', {
-                    screen: 'ProductList'
-                });
+                if (screenRoute && screenRoute?.routeName) {
+                    navigation.navigate(screenRoute?.routeName, screenRoute?.params || {});
+                } else if (screen) {
+                    navigation.navigate(screen);
+                }
             }, 1000);
         });
     }, [fadeAnim, navigation]);
@@ -29,7 +32,7 @@ const SuccessScreen = () => {
                 <SuccessIcon />
             </Animated.View>
             <View style={{ paddingHorizontal: 40 }}>
-                <Typo style={{ textAlign: 'center' }} type='h3' title='Successfully Created a Account' />
+                <Typo style={{ textAlign: 'center' }} type='h3' title={message} />
             </View>
         </SafeAreaView>
     )

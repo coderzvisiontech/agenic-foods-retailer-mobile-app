@@ -10,12 +10,14 @@ const Typography = ({
     ellipsis = false,
     style,
     onPress,
+    tailWidth
 }) => {
     const baseStyle = styles[type] || styles.p;
     const textStyles = [
         baseStyle,
         disabled && styles.disabled,
         link && styles.link,
+        ellipsis && tailWidth && { width: tailWidth },
         style,
     ];
 

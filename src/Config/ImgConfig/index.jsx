@@ -20,6 +20,12 @@ import SearchIcon from "../../Assets/Icons/search_icon.svg"
 import RightIcon from "../../Assets/Icons/right_icon.svg"
 import DeleteIcon from "../../Assets/Icons/delete_icon.svg"
 import ToastIcon from "../../Assets/Icons/toast_logo.svg"
+import UserIcon from "../../Assets/Icons/user_icon.svg"
+import OrderIcon from "../../Assets/Icons/order_icon.svg"
+import CreditIcon from "../../Assets/Icons/credit_icon.svg"
+import SupportIcon from "../../Assets/Icons/support_icon.svg"
+import LogoutIcon from "../../Assets/Icons/logout_icon.svg"
+import PrimaryRightIcon from "../../Assets/Icons/primary_right.svg"
 
 // Home Icon
 const HomeIcon = ({ color = ColorPalatte.grey_300, ...props }) => (
@@ -144,6 +150,12 @@ export {
     RightIcon,
     DeleteIcon,
     ToastIcon,
+    UserIcon,
+    OrderIcon,
+    CreditIcon,
+    SupportIcon,
+    LogoutIcon,
+    PrimaryRightIcon,
     HomeIcon,
     CartIcon,
     NotificationIcon,

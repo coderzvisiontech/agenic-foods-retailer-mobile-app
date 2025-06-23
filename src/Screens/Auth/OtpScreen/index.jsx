@@ -1,14 +1,15 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
     View,
     Dimensions,
     StyleSheet,
     SafeAreaView,
-    Text,
     TouchableOpacity,
-    Image
+    Image,
+    Keyboard
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFormik } from 'formik';
 import {
     BackgroundWrapper,
@@ -18,24 +19,75 @@ import {
     CheckboxComp,
     OTPInput
 } from '../../../Components';
-import { ColorPalatte } from '../../../Themes';
+import { ColorPalatte, FontSize } from '../../../Themes';
 import { EditIcon, OtpBg } from '../../../Config/ImgConfig';
+import { otpSchema } from '../../../Utils/ValidationSchema';
+import { showToast } from '../../../Utils/Helper/toastHelper';
+import { useDispatch } from 'react-redux';
+import { authOtpVerify } from '../../../Redux/Action/Auth';
+import { userProfile } from '../../../Redux/Action/Profile';
 
 const { height, width } = Dimensions.get('window');
 
 const OtpScreen = ({ route }) => {
     const navigation = useNavigation();
+    const dispatch = useDispatch();
     const { phone } = route.params;
+
+    const [otpData, setOtpData] = useState({
+        infoData: {
+            loading: false
+        }
+    })
 
     const formik = useFormik({
         initialValues: {
-            otp: ''
+            otp: '',
+            terms: false
         },
-        // validationSchema: LoginSchema,
+        validationSchema: otpSchema,
         onSubmit: (values) => {
-            console.log('Form values:', values);
-            navigation.navigate("SuccessScreen")
-
+            Keyboard.dismiss()
+            const payload = {
+                phone: {
+                    code: '91',
+                    number: phone
+                },
+                otp: values?.otp,
+            }
+            setOtpData((prev) => ({
+                ...prev,
+                infoData: { loading: true }
+            }))
+            dispatch(authOtpVerify(payload)).then(async (res) => {
+                if (res?.payload?.status === 200) {
+                    showToast('success', 'OTP verified successfully');
+                    setOtpData((prev) => ({
+                        ...prev,
+                        infoData: { loading: false }
+                    }))
+                    await AsyncStorage.setItem('token', res?.payload?.data?.token);
+                    dispatch(userProfile()).then(async (res) => {
+                        if (res?.payload?.status === 200) {
+                            await AsyncStorage.setItem('email', res?.payload?.data?.response?.[0]?.email)
+                            await AsyncStorage.setItem('full_name', `${res?.payload?.data?.response?.[0]?.first_name} ${res?.payload?.data?.response?.[0]?.last_name}`)
+                            await AsyncStorage.setItem('user_id', res?.payload?.data?.response?.[0]?._id)
+                            await AsyncStorage.setItem('phone_number', res?.payload?.data?.response?.[0]?.phone?.number)
+                            setTimeout(() => {
+                                navigation.navigate('BottomTab', { screen: 'Home' })
+                            }, 1500)
+                        } else {
+                            showToast('error', 'Something went wrong')
+                        }
+                    })
+                } else {
+                    setOtpData((prev) => ({
+                        ...prev,
+                        infoData: { loading: false }
+                    }))
+                    showToast('error', res?.payload?.message)
+                }
+            })
         },
     });
 
@@ -62,21 +114,27 @@ const OtpScreen = ({ route }) => {
                         <Typo type='h2' title='Verify Mobile Number' />
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
                             <Typo type='p' title={`Enter OTP Sent to ${phone}`} />
-                            <TouchableOpacity>
+                            <TouchableOpacity onPress={() => navigation.navigate("LoginScreen")}>
                                 <EditIcon />
                             </TouchableOpacity>
                         </View>
                     </View>
 
-                    <View style={{ paddingVertical: 30 }}>
+                    <View style={{ paddingVertical: 30, alignItems: 'center', gap: 10, paddingBottom: Object.keys(formik.errors).length > 0 ? 15 : 40 }}>
                         <OTPInput length={6} value={formik.values.otp} setValue={formik.handleChange('otp')} />
+                        {(formik.errors.otp || formik.errors.terms) && (
+                            <Typo
+                                style={styles.error}
+                                title={formik.errors.otp || formik.errors.terms}
+                            />
+                        )}
                     </View>
 
                     <View style={{ gap: 10 }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, justifyContent: 'center' }}>
                             <CheckboxComp
-                                value={true}
-                            // onValueChange={setAgreed}
+                                value={formik.values.terms}
+                                onValueChange={(value) => formik.setFieldValue('terms', value)}
                             />
                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                 <Typo type='label' title='Accept ' />
@@ -87,6 +145,7 @@ const OtpScreen = ({ route }) => {
                             title="Verify & Proceed"
                             type="largePrimary"
                             onPress={formik.handleSubmit}
+                            disable={otpData?.infoData?.loading}
                         />
                         <View style={{ alignItems: 'center', flexDirection: 'row', gap: 10, justifyContent: 'center' }}>
                             <Typo type='label' title='Don’t Receive a Code?' />
@@ -97,7 +156,6 @@ const OtpScreen = ({ route }) => {
                     </View>
                 </View>
             </BackgroundWrapper>
-
         </SafeAreaView >
     )
 }
@@ -107,6 +165,10 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: ColorPalatte.whiteClr,
     },
+    error: {
+        color: ColorPalatte.errorclr,
+        fontSize: FontSize.fontSize12
+    }
 });
 
 export default OtpScreen

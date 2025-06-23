@@ -11,6 +11,7 @@ import PrimaryHeader from "./PrimaryHeader";
 import ProductCard from "./ProductCard"
 import BottomSheet from "./BottomSheet";
 import Toast from "./Toast";
+import Avatar from "./Avatar";
 
 
 export {
@@ -26,5 +27,6 @@ export {
     PrimaryHeader,
     ProductCard,
     BottomSheet,
-    Toast
+    Toast,
+    Avatar
 }

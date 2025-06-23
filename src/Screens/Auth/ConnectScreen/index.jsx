@@ -1,17 +1,17 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useNavigation } from '@react-navigation/native'
-import { Dimensions, Image, SafeAreaView, TouchableOpacity, StyleSheet, View } from 'react-native'
+import { Dimensions, Image, SafeAreaView, StyleSheet, View } from 'react-native'
 
 import { Logo, BasketImg } from '../../../Config/ImgConfig'
-import { BackgroundWrapper, ButtonComp, Typo, StatusBarComp } from '../../../Components'
-import { ColorPalatte, FontSize } from '../../../Themes'
+import { ButtonComp, Typo, StatusBarComp } from '../../../Components'
+import { ColorPalatte } from '../../../Themes'
 
-const { height, width } = Dimensions.get('window')
+const { width } = Dimensions.get('window')
 
 
 const ConnectScreen = () => {
-    const navigation = useNavigation()
-
+    const navigation = useNavigation();
+    
     return (
         <SafeAreaView style={styles.container}>
             <StatusBarComp backgroundColor={ColorPalatte.whiteClr} visible={true} />
