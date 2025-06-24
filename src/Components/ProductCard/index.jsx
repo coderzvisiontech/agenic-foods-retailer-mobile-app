@@ -133,13 +133,13 @@
 
 
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Image, StyleSheet, TouchableOpacity, Text } from 'react-native';
 import { VITE_UPLOAD_IMG } from "@env"
-import { Typo, BottomSheet } from "../../Components"
+import { Typo } from "../../Components"
 import { ColorPalatte } from '../../Themes';
-import { DecrementIcon, DeleteIcon, IncrementIcon } from '../../Config/ImgConfig';
+import { DecrementIcon, DeleteIcon, DisableDecrementIcon, DisableIncrementIcon, IncrementIcon } from '../../Config/ImgConfig';
 
-const ProductCard = ({ data, onQuantityChange, isDelete, onDelete, tailWidth, ellipsis }) => {
+const ProductCard = ({ data, onQuantityChange, isDelete, onDelete, tailWidth, ellipsis = false }) => {
     const {
         name,
         price,
@@ -152,6 +152,7 @@ const ProductCard = ({ data, onQuantityChange, isDelete, onDelete, tailWidth, el
 
     const [qty, setQty] = useState(quantity);
     const debounceTimer = useRef(null);
+    const isSoldOut = items_left === 0;
 
     const increaseQty = () => {
         setQty(prev => prev + 1);
@@ -162,22 +163,20 @@ const ProductCard = ({ data, onQuantityChange, isDelete, onDelete, tailWidth, el
     };
 
     useEffect(() => {
-        if (debounceTimer.current) {
-            clearTimeout(debounceTimer.current);
-        }
+        if (isSoldOut) return;
+        if (debounceTimer.current) clearTimeout(debounceTimer.current);
 
         debounceTimer.current = setTimeout(() => {
             onQuantityChange?.({ ...data, quantity: qty });
-        }, 500);
+        }, 300);
     }, [qty]);
 
     useEffect(() => {
         return () => {
-            if (debounceTimer.current) {
-                clearTimeout(debounceTimer.current);
-            }
+            if (debounceTimer.current) clearTimeout(debounceTimer.current);
         };
     }, []);
+
 
     const totalPrice = qty === 0 ? price : price * qty;
 
@@ -187,9 +186,8 @@ const ProductCard = ({ data, onQuantityChange, isDelete, onDelete, tailWidth, el
                 source={
                     image ? { uri: `${VITE_UPLOAD_IMG}${image}` } : require('../../Assets/Images/otp_bg.jpg')
                 }
-                style={styles.image}
+                style={[styles.image, isSoldOut && { opacity: 0.4 }]}
                 resizeMode="cover"
-                onError={(e) => console.log('Image load error:', e.nativeEvent.error)}
             />
 
             <View style={{
@@ -201,10 +199,13 @@ const ProductCard = ({ data, onQuantityChange, isDelete, onDelete, tailWidth, el
                     justifyContent: 'space-between',
                     alignItems: 'center'
                 }}>
-                    <Typo tailWidth={tailWidth} ellipsis={ellipsis} type='h5' title={name}
+                    <Typo tailWidth={isSoldOut ? 130 : tailWidth} ellipsis={isSoldOut ? true : ellipsis} style={isSoldOut && { color: ColorPalatte.disableTxt }} type='h5' title={name}
                     />
-                    {/* <Typo type='h5' title={name} /> */}
-
+                    {isSoldOut && (
+                        <View style={styles.soldOutBadge}>
+                            <Text style={styles.soldOutText}>Sold Out</Text>
+                        </View>
+                    )}
                     {isDelete && (
                         <TouchableOpacity onPress={() => onDelete?.(data)}>
                             <DeleteIcon />
@@ -212,18 +213,31 @@ const ProductCard = ({ data, onQuantityChange, isDelete, onDelete, tailWidth, el
                     )}
                 </View>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <Typo type='h6' title={`₹${price}`} />
-                    <Typo type='label' title={`/${unit}`} />
+                    <Typo style={isSoldOut && { color: ColorPalatte.disableTxt }} type='h6' title={`₹${price}`} />
+                    <Typo style={isSoldOut && { color: ColorPalatte.disableTxt }} type='label' title={`/${unit}`} />
                 </View>
 
-                <Typo
-                    style={{
-                        color: ColorPalatte.primaryClr,
-                        fontFamily: 'Outfit-Medium'
-                    }}
-                    type='label'
-                    title={`${items_left} ${unit}s Left`}
-                />
+                {isSoldOut ? (
+                    <>
+                        <Typo
+                            style={{
+                                color: ColorPalatte.disableTxt,
+                                fontFamily: 'Outfit-Medium'
+                            }}
+                            type='label'
+                            title={`0 item Left`}
+                        />
+                    </>
+                ) : (
+                    <Typo
+                        style={{
+                            color: ColorPalatte.primaryClr,
+                            fontFamily: 'Outfit-Medium'
+                        }}
+                        type='label'
+                        title={`${items_left} item${items_left > 1 && 's'} Left`}
+                    />
+                )}
 
                 <View style={{
                     flexDirection: 'row',
@@ -231,15 +245,15 @@ const ProductCard = ({ data, onQuantityChange, isDelete, onDelete, tailWidth, el
                     alignItems: 'center',
                     marginTop: 10,
                 }}>
-                    <Typo style={{ fontFamily: 'Outfit-Bold' }} type='h4' title={`₹${totalPrice.toFixed(1)}`} />
+                    <Typo style={isSoldOut ? { fontFamily: 'Outfit-Bold', color: ColorPalatte.disableTxt } : { fontFamily: 'Outfit-Bold' }} type='h4' title={`₹${totalPrice.toFixed(1)}`} />
 
                     <View style={styles.counter}>
-                        <TouchableOpacity onPress={decreaseQty}>
-                            <DecrementIcon />
+                        <TouchableOpacity disabled={isSoldOut} onPress={decreaseQty}>
+                            {isSoldOut ? <DisableDecrementIcon /> : <DecrementIcon />}
                         </TouchableOpacity>
-                        <Typo style={{ fontFamily: 'Outfit-Bold' }} type='h5' title={qty} />
-                        <TouchableOpacity onPress={increaseQty}>
-                            <IncrementIcon />
+                        <Typo style={isSoldOut ? { fontFamily: 'Outfit-Bold', color: ColorPalatte.disableTxt } : { fontFamily: 'Outfit-Bold', color: ColorPalatte.primartTxt }} type='h5' title={qty} />
+                        <TouchableOpacity disabled={isSoldOut} onPress={increaseQty}>
+                            {isSoldOut ? <DisableIncrementIcon /> : <IncrementIcon />}
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -268,5 +282,15 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 8,
+    },
+    soldOutText: {
+        color: ColorPalatte.errorclr,
+        fontSize: 12,
+        fontFamily: 'Outfit-Regular',
+        borderWidth: 1,
+        borderColor: ColorPalatte.errorclr,
+        paddingHorizontal: 6,
+        paddingVertical: 4,
+        borderRadius: 4,
     },
 });

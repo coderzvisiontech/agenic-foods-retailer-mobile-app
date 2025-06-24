@@ -3,8 +3,8 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { VITE_API_URL } from "@env"
 
-export const productList = createAsyncThunk(
-    "getfresh/product/list",
+export const cartList = createAsyncThunk(
+    "getfresh/cart/list",
     async (_, { rejectWithValue }) => {
         const token = await AsyncStorage.getItem('token');
         const config = {
@@ -15,10 +15,10 @@ export const productList = createAsyncThunk(
         }
 
         try {
-            const response = await axios.get(`${VITE_API_URL}/product`, config);
+            const response = await axios.get(`${VITE_API_URL}/cart`, config);
             return response;
         } catch (error) {
-          
+
             if (error?.response && error?.response?.data) {
                 return rejectWithValue(error?.response?.data);
             } else {
@@ -30,8 +30,8 @@ export const productList = createAsyncThunk(
     }
 );
 
-export const addCart = createAsyncThunk(
-    "getfresh/product/addCart",
+export const cartDelete = createAsyncThunk(
+    "getfresh/cart/delete",
     async (dataObject, { rejectWithValue }) => {
         const token = await AsyncStorage.getItem('token');
         const config = {
@@ -42,10 +42,10 @@ export const addCart = createAsyncThunk(
         }
 
         try {
-            const response = await axios.post(`${VITE_API_URL}/cart`, dataObject, config);
+            const response = await axios.delete(`${VITE_API_URL}/cart`, dataObject, config);
             return response;
         } catch (error) {
-          
+
             if (error?.response && error?.response?.data) {
                 return rejectWithValue(error?.response?.data);
             } else {
@@ -56,3 +56,4 @@ export const addCart = createAsyncThunk(
         }
     }
 );
+

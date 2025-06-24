@@ -1,10 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, TouchableOpacity, View } from 'react-native';
-import { ColorPalatte } from '../../../../Themes';
-import { Typo } from '../../../../Components';
-// import { RightIcon } from '../../../../Config/ImgConfig';
+import { ColorPalatte } from '../../Themes';
+import { Typo } from '../../Components';
+import { RightIcon } from '../../Config/ImgConfig';
 
-const AddCart = ({ items = [], onViewCart }) => {
+const BottomCard = ({ items = [], onPress, btnTitle = 'Add to Cart', isRight = false, bottom }) => {
     const translateY = useRef(new Animated.Value(100)).current;
     const opacity = useRef(new Animated.Value(0)).current;
 
@@ -46,6 +46,7 @@ const AddCart = ({ items = [], onViewCart }) => {
                 {
                     transform: [{ translateY }],
                     opacity,
+                    bottom: bottom,
                 },
             ]}
         >
@@ -54,10 +55,12 @@ const AddCart = ({ items = [], onViewCart }) => {
                 <Typo type='h3' title={`₹${totalAmount.toFixed(2)}`} />
             </View>
 
-            <TouchableOpacity onPress={onViewCart}>
+            <TouchableOpacity onPress={onPress}>
                 <View style={styles.button}>
-                    <Typo style={{ fontFamily: 'Outfit-Bold', color: ColorPalatte.whiteClr }} title='Add to Cart' />
-                    {/* <RightIcon /> */}
+                    <Typo style={{ fontFamily: 'Outfit-Bold', color: ColorPalatte.whiteClr }} title={btnTitle} />
+                    {isRight && (
+                        <RightIcon />
+                    )}
                 </View>
             </TouchableOpacity>
         </Animated.View>
@@ -69,7 +72,6 @@ const styles = StyleSheet.create({
     container: {
         backgroundColor: ColorPalatte.whiteClr,
         position: 'absolute',
-        bottom: 75,
         left: 20,
         right: 20,
         height: 81,
@@ -98,4 +100,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default AddCart
+export default BottomCard

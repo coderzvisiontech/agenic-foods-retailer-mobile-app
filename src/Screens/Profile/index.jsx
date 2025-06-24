@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { SafeAreaView, StyleSheet, View } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigation } from '@react-navigation/native'
@@ -10,14 +10,13 @@ import { ListCard } from './Component'
 import { PROFILE_MENU } from '../../Interface'
 import { authLogout } from '../../Redux/Action/Auth'
 import { userProfile } from '../../Redux/Action/Profile'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const ProfileScreen = () => {
     const dispatch = useDispatch();
     const navigation = useNavigation()
     const { user } = useUserData();
     const { data } = useSelector(state => state.profile);
-
-    console.log('data', data)
 
     useEffect(() => {
         dispatch(userProfile()).then((res) => {
@@ -31,10 +30,11 @@ const ProfileScreen = () => {
 
     }
 
-    const EditProfile = () => {
-        console.log('Edit Profile');
+    const updateProfile = useCallback((values) => {
+        console.log('Updated values:', values);
+    }, []);
 
-    }
+
 
     const handleItemPress = (key) => {
         switch (key) {
@@ -50,7 +50,14 @@ const ProfileScreen = () => {
                 console.log('Contact Support');
                 break;
             case 'logout':
-                dispatch(authLogout());
+                // dispatch(authLogout()).then((res)=>{
+                //     console.log('res',res)
+                // })
+                AsyncStorage.removeItem('token').then(() => {
+                    navigation.navigate('LoginScreen');
+                }).catch((error) => {
+                    console.error('Error removing token:', error);
+                });
                 break;
             default:
                 break;
@@ -62,14 +69,14 @@ const ProfileScreen = () => {
             <SecondaryHeader isBack screenName='Account' />
             <View style={styles.bodyWrapper}>
                 <Avatar fullName={user?.name} />
-                <View style={{ alignItems: 'center', paddingVertical: 20, gap: 5 }}>
+                <View style={{ alignItems: 'center', gap: 5 }}>
                     <Typo style={{ fontFamily: 'Outfit-Bold' }} type='h5' title={user?.name} />
                     <Typo style={{ fontFamily: 'Outfit-Medium', fontSize: 14, color: ColorPalatte.secondaryTxt }} type='h5' title={user?.email} />
                     <ButtonComp
                         onPress={() =>
                             navigation.navigate('ProfileDetail', {
                                 name: 'My Profile',
-                                EditProfile,
+                                updateProfile,
                                 data: data?.response?.[0],
                             })
                         }

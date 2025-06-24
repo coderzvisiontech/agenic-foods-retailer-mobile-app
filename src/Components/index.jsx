@@ -12,6 +12,7 @@ import ProductCard from "./ProductCard"
 import BottomSheet from "./BottomSheet";
 import Toast from "./Toast";
 import Avatar from "./Avatar";
+import BottomCard from "./BottomCard";
 
 
 export {
@@ -28,5 +29,6 @@ export {
     ProductCard,
     BottomSheet,
     Toast,
-    Avatar
+    Avatar,
+    BottomCard
 }

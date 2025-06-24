@@ -12,11 +12,11 @@ export const authLogin = createAsyncThunk(
             }
         }
 
-        try {
+        try {            
             const response = await axios.post(`${VITE_API_URL}/auth/login`, dataObject, config);
             return response;
         } catch (error) {
-            console.log('error', error)
+          
             if (error?.response && error?.response?.data) {
                 return rejectWithValue(error?.response?.data);
             } else {
@@ -42,7 +42,7 @@ export const authSignup = createAsyncThunk(
             const response = await axios.post(`${VITE_API_URL}/auth/register`, dataObject, config);
             return response;
         } catch (error) {
-            console.log('error', error)
+          
             if (error?.response && error?.response?.data) {
                 return rejectWithValue(error?.response?.data);
             } else {
@@ -68,7 +68,7 @@ export const authOtpVerify = createAsyncThunk(
             const response = await axios.post(`${VITE_API_URL}/auth/verify-otp`, dataObject, config);
             return response;
         } catch (error) {
-            console.log('error', error)
+          
             if (error?.response && error?.response?.data) {
                 return rejectWithValue(error?.response?.data);
             } else {
@@ -94,7 +94,6 @@ export const authLogout = createAsyncThunk(
             const response = await axios.delete(`${VITE_API_URL}/auth/logout`, dataObject, config);
             return response;
         } catch (error) {
-            console.log('error', error)
             if (error?.response && error?.response?.data) {
                 return rejectWithValue(error?.response?.data);
             } else {

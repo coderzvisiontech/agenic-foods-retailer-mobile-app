@@ -100,7 +100,6 @@ const RegisterScreen = ({ route }) => {
                     }))
                 }
                 else {
-                    console.log('else part')
                     setRegisterData((prev) => ({
                         ...prev,
                         infoState: { loading: false }

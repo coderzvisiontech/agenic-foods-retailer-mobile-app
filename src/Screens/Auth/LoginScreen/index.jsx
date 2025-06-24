@@ -57,7 +57,6 @@ const LoginScreen = () => {
         },
         validationSchema: LoginSchema,
         onSubmit: (values) => {
-            console.log('Form values:', values);
             Keyboard.dismiss()
             setLoginData((prev) => ({
                 ...prev,

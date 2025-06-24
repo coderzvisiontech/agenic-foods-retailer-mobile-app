@@ -18,7 +18,7 @@ export const userProfile = createAsyncThunk(
             const response = await axios.get(`${VITE_API_URL}/profile`, config);
             return response;
         } catch (error) {
-            console.log('error', error)
+          
             if (error?.response && error?.response?.data) {
                 return rejectWithValue(error?.response?.data);
             } else {
