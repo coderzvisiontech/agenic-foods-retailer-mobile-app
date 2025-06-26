@@ -31,6 +31,10 @@ import DisableIncrementIcon from "../../Assets/Icons/disable_incerement.svg"
 import NoOrder from "../../Assets/Icons/no_order.svg"
 import BlackRIght from "../../Assets/Icons/black_right.svg"
 import CheckIcon from "../../Assets/Icons/check_icon.svg"
+import NoCart from "../../Assets/Icons/no_cart.svg"
+import UpIcon from "../../Assets/Icons/up_icon.svg"
+import DownIcon from "../../Assets/Icons/down_icon.svg"
+import Cash from "../../Assets/Icons/cash.svg"
 
 // Home Icon
 const HomeIcon = ({ color = ColorPalatte.grey_300, ...props }) => (
@@ -166,6 +170,10 @@ export {
     NoOrder,
     BlackRIght,
     CheckIcon,
+    NoCart,
+    UpIcon,
+    DownIcon,
+    Cash,
     HomeIcon,
     CartIcon,
     NotificationIcon,

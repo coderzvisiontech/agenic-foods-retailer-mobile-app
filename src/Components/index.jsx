@@ -15,6 +15,7 @@ import Avatar from "./Avatar";
 import BottomCard from "./BottomCard";
 import OrderCard from "./OrderCard";
 import StatusTracking from "./StatusTracking";
+import RadioButton from "./RadioButton";
 
 
 export {
@@ -34,5 +35,6 @@ export {
     Avatar,
     BottomCard,
     OrderCard,
-    StatusTracking
+    StatusTracking,
+    RadioButton
 }

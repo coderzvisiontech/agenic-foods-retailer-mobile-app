@@ -57,3 +57,29 @@ export const cartDelete = createAsyncThunk(
     }
 );
 
+export const cartTimeslot = createAsyncThunk(
+    "getfresh/cart/timeSlot",
+    async (dataObject, { rejectWithValue }) => {
+        const token = await AsyncStorage.getItem('token');
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `${token}`,
+            }
+        }
+
+        try {
+            const response = await axios.post(`${VITE_API_URL}/timeslot`, dataObject, config);
+            return response;
+        } catch (error) {
+
+            if (error?.response && error?.response?.data) {
+                return rejectWithValue(error?.response?.data);
+            } else {
+                return rejectWithValue({
+                    message: error,
+                });
+            }
+        }
+    }
+);

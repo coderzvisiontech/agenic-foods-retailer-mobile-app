@@ -12,6 +12,7 @@ import { DetailScreen } from '../Screens/Profile/Component';
 import OrderDeatils from '../Screens/Order';
 import CheckoutScreen from '../Screens/Checkout';
 import { OrderDetailScreen } from '../Screens/Order/Components';
+import PaymentScreen from '../Screens/Payment';
 
 const Stack = createNativeStackNavigator();
 const options = { headerShown: false };
@@ -46,6 +47,7 @@ const ScreenRoutes = () => {
 
                 {/* Checkout Screen */}
                 <Stack.Screen name='CheckoutScreen' component={CheckoutScreen} options={options} />
+                <Stack.Screen name='PaymentScreen' component={PaymentScreen} options={options} />
             </Stack.Navigator>
         </NavigationContainer>
     )

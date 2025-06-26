@@ -34,7 +34,6 @@ const OrderDeatils = () => {
         })) || [];
     }, [order]);
 
-    console.log('orderData', orderData);
     return (
         <SafeAreaView style={styles.container}>
             <SecondaryHeader isBack screenName={'Orders'} onPressBack={() => navigation.goBack()} />
@@ -56,7 +55,7 @@ const OrderDeatils = () => {
                         <NoOrder />
                         <View style={{ alignItems: 'center', gap: 5 }}>
                             <Typo style={{ fontSize: FontSize.fontSize16, fontFamily: 'Outfit-Medium' }} title={'Your order history is empty.'} />
-                            <Typo style={{ fontSize: FontSize.fontSize14, fontFamily: 'Outfit-Medium', color: ColorPalatte.grey_400 }} title={' Check back after your first purchase!'} />
+                            <Typo style={{ fontSize: FontSize.fontSize14, fontFamily: 'Outfit-Medium', color: ColorPalatte.grey_400 }} title={'Check back after your first purchase!'} />
                         </View>
                         <ButtonComp type='mediumPrimary' title='Back to Home' onPress={() => navigation.navigate('BottomTab', { screen: 'Home' })} />
                     </View>

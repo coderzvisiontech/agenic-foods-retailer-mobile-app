@@ -7,6 +7,7 @@ import {
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {
     PrimaryHeader,
@@ -19,6 +20,7 @@ import { ColorPalatte } from '../../Themes';
 import { addCart, productList } from '../../Redux/Action/Product';
 import useUserData from '../../Hooks/useFetchUser';
 import { showToast } from '../../Utils/Helper/toastHelper';
+import { getCartProducts, storeCartProducts } from '../../Hooks/useStoreBulkData';
 
 const ProductList = () => {
     const navigation = useNavigation();
@@ -26,7 +28,9 @@ const ProductList = () => {
     const { products } = useSelector(state => state.product);
     const { user } = useUserData();
 
-    const [quantities, setQuantities] = useState({});
+    const [homeData, setHomeData] = useState({
+        quantities: {},
+    })
 
     useFocusEffect(
         useCallback(() => {
@@ -37,10 +41,10 @@ const ProductList = () => {
     const mappedProducts = useMemo(() => {
         return products?.response?.document?.map((item) => ({
             ...item,
-            quantity: quantities[item?.id],
+            quantity: homeData?.quantities?.[item?.id],
             items_left: item?.quantity
         })) || [];
-    }, [products, quantities]);
+    }, [products, homeData?.quantities]);
 
     const counts = useMemo(() => ({
         cartCount: products?.cartCount,
@@ -48,10 +52,10 @@ const ProductList = () => {
     }), [products]);
 
     const handleQuantityChange = useCallback((updatedItem) => {
-        setQuantities(prev => ({
+        setHomeData((prev) => ({
             ...prev,
-            [updatedItem?.id]: updatedItem?.quantity
-        }));
+            quantities: { ...prev.quantities, [updatedItem?.id]: updatedItem?.quantity }
+        }))
     }, []);
 
     const cartItems = useMemo(() =>
@@ -59,19 +63,60 @@ const ProductList = () => {
         [mappedProducts]
     );
 
-    const handleCheckout = () => {
-        const cartPayload = cartItems?.map(item => ({
-            product_id: item?.id,
-            quantity: item?.quantity,
-            price: (item?.price * item?.quantity),
-        }));
-        dispatch(addCart({ cart_add: cartPayload })).then((res) => {
-            console.log('Add to Cart', res)
-            if (res?.payload?.data?.rt_approved_status === 1 && res?.payload?.data?.status === 1) {
-                showToast('success', 'Cart added successfully!');
-                setQuantities({});
-            }
-        })
+    // const handleCheckout = () => {
+    //     console.log('cartItems--->', cartItems)
+    //     storeCartProducts(cartItems)
+    //     showToast('success', 'Cart added successfully!');
+    //     setHomeData((prev) => ({
+    //         ...prev,
+    //         quantities: {}
+    //     }))
+    //     // const cartPayload = cartItems?.map(item => ({
+    //     //     product_id: item?.id,
+    //     //     quantity: item?.quantity,
+    //     //     price: (item?.price * item?.quantity),
+    //     // }));
+    //     // dispatch(addCart({ cart_add: cartPayload })).then((res) => {
+    //     //     console.log('Add to Cart', res)
+    //     //     if (res?.payload?.data?.rt_approved_status === 1 && res?.payload?.data?.status === 1) {
+    //     //         showToast('success', 'Cart added successfully!');
+    //     //         setQuantities({});
+    //     //     }
+    //     // })
+    // };
+
+    const handleCheckout = async () => {
+        try {
+            const existingCart = await getCartProducts();
+
+            const cartMap = new Map();
+
+            existingCart?.forEach(item => {
+                cartMap?.set(item?.id, { ...item });
+            });
+
+            cartItems.forEach(newItem => {
+                if (cartMap?.has(newItem?.id)) {
+                    const existing = cartMap.get(newItem?.id);
+                    const updatedQty = existing.quantity + newItem?.quantity;
+                    cartMap?.set(newItem?.id, { ...existing, quantity: updatedQty });
+                } else {
+                    cartMap.set(newItem?.id, { ...newItem });
+                }
+            });
+
+            const updatedCart = Array?.from(cartMap?.values());
+
+            await storeCartProducts(updatedCart);
+
+            showToast('success', 'Cart added successfully!');
+            setHomeData((prev) => ({
+                ...prev,
+                quantities: {}
+            }));
+        } catch (error) {
+            console.error('Error updating cart:', error);
+        }
     };
 
     const renderItem = useCallback(({ item }) => (

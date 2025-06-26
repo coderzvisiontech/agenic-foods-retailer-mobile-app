@@ -4,7 +4,7 @@ import { ColorPalatte } from '../../Themes';
 import { Typo } from '../../Components';
 import { RightIcon } from '../../Config/ImgConfig';
 
-const BottomCard = ({ items = [], onPress, btnTitle = 'Add to Cart', isRight = false, bottom }) => {
+const BottomCard = ({ items = [], onPress, btnTitle = 'Add to Cart', isRight = false, bottom, isTotal = true, isAlign }) => {
     const translateY = useRef(new Animated.Value(100)).current;
     const opacity = useRef(new Animated.Value(0)).current;
 
@@ -37,7 +37,7 @@ const BottomCard = ({ items = [], onPress, btnTitle = 'Add to Cart', isRight = f
         }
     }, [items?.length]);
 
-    const totalAmount = items?.reduce((sum, item) => sum + item?.price * item?.quantity, 0);
+    const totalAmount = items?.reduce((sum, item) => sum + (item?.price || item?.total) * item?.quantity, 0);
 
     return (
         <Animated.View
@@ -47,12 +47,17 @@ const BottomCard = ({ items = [], onPress, btnTitle = 'Add to Cart', isRight = f
                     transform: [{ translateY }],
                     opacity,
                     bottom: bottom,
+                    left: isAlign ? 0 : 20,
+                    right: isAlign ? 0 : 20,
+                    width: isAlign ? '100%' : ''
                 },
             ]}
         >
             <View>
-                <Typo title={`Total ${items.length} item${items.length > 1 ? 's' : ''}`} />
-                <Typo type='h3' title={`₹${totalAmount.toFixed(2)}`} />
+                {isTotal && (
+                    <Typo title={`Total ${items.length} item${items.length > 1 ? 's' : ''}`} />
+                )}
+                <Typo type='h3' title={`₹${(totalAmount).toFixed(2)}`} />
             </View>
 
             <TouchableOpacity onPress={onPress}>
@@ -72,14 +77,15 @@ const styles = StyleSheet.create({
     container: {
         backgroundColor: ColorPalatte.whiteClr,
         position: 'absolute',
-        left: 20,
-        right: 20,
+        // left: 20,
+        // right: 20,
         height: 81,
         borderRadius: 8,
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingHorizontal: 20,
+        // width: '100%',
 
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },

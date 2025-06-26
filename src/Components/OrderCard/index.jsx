@@ -8,7 +8,6 @@ import { BlackRIght } from '../../Config/ImgConfig'
 import { formatList } from '../../Utils/CommonFunctions'
 
 const OrderCard = ({ data, onOrderPress, isOrder = true }) => {
-    console.log('data', data)
     return (
         <TouchableOpacity style={styles.container} onPress={onOrderPress}>
             <Image
