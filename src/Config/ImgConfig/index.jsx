@@ -28,6 +28,9 @@ import LogoutIcon from "../../Assets/Icons/logout_icon.svg"
 import PrimaryRightIcon from "../../Assets/Icons/primary_right.svg"
 import DisableDecrementIcon from "../../Assets/Icons/disable_decrement.svg"
 import DisableIncrementIcon from "../../Assets/Icons/disable_incerement.svg"
+import NoOrder from "../../Assets/Icons/no_order.svg"
+import BlackRIght from "../../Assets/Icons/black_right.svg"
+import CheckIcon from "../../Assets/Icons/check_icon.svg"
 
 // Home Icon
 const HomeIcon = ({ color = ColorPalatte.grey_300, ...props }) => (
@@ -160,6 +163,9 @@ export {
     PrimaryRightIcon,
     DisableDecrementIcon,
     DisableIncrementIcon,
+    NoOrder,
+    BlackRIght,
+    CheckIcon,
     HomeIcon,
     CartIcon,
     NotificationIcon,

@@ -11,6 +11,7 @@ import SuccessScreen from '../Screens/SuccessScreen';
 import { DetailScreen } from '../Screens/Profile/Component';
 import OrderDeatils from '../Screens/Order';
 import CheckoutScreen from '../Screens/Checkout';
+import { OrderDetailScreen } from '../Screens/Order/Components';
 
 const Stack = createNativeStackNavigator();
 const options = { headerShown: false };
@@ -41,6 +42,7 @@ const ScreenRoutes = () => {
 
                 {/* Order Screen */}
                 <Stack.Screen name='OrderDeatils' component={OrderDeatils} options={options} />
+                <Stack.Screen name='OrderDetailScreen' component={OrderDetailScreen} options={options} />
 
                 {/* Checkout Screen */}
                 <Stack.Screen name='CheckoutScreen' component={CheckoutScreen} options={options} />

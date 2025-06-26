@@ -5,15 +5,14 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native'
 
 import { BottomCard, BottomSheet, ButtonComp, ProductCard, SecondaryHeader, Typo } from '../../Components'
 import { ColorPalatte } from '../../Themes'
-import useUserData from '../../Hooks/useFetchUser'
 import { cartDelete, cartList } from '../../Redux/Action/Cart'
+import { NoOrder } from '../../Config/ImgConfig'
 
 const { height } = Dimensions.get('window');
 
 const CartScreen = () => {
     const navigation = useNavigation();
     const dispatch = useDispatch();
-    const { user } = useUserData();
     const { cart } = useSelector(state => state.cart);
     const [cartData, setCartData] = useState({
         infoState: {
@@ -30,7 +29,7 @@ const CartScreen = () => {
 
     const mappedCart = useMemo(() => {
         return cart?.response?.map((item) => ({
-            userId: user?.id,
+            userId: item?.id,
             selected_qty: item?.selectedQuantity,
             product_id: item?.product?.id,
             image: item?.product?.image,
@@ -42,6 +41,7 @@ const CartScreen = () => {
             quantity: item?.selectedQuantity,
         })) || [];
     }, [cart]);
+    console.log('cart', cart);
 
     const renderCheckout = useMemo(() => {
         return mappedCart?.length > 0 && (
@@ -56,7 +56,6 @@ const CartScreen = () => {
     }, [mappedCart]);
 
     const renderItem = useCallback(({ item }) => {
-        console.log('item', item)
         return (
             <ProductCard
                 data={item}
@@ -75,7 +74,7 @@ const CartScreen = () => {
                 }}
             />
         );
-    }, [navigation]);
+    }, []);
 
     const handleDelete = useCallback(() => {
         console.log('handleDelete', cartData?.infoState?.delItem);
@@ -95,18 +94,23 @@ const CartScreen = () => {
         <SafeAreaView style={styles.container}>
             <SecondaryHeader isBack onPressBack={() => navigation.goBack()} screenName={'Cart'} />
             <View style={{ paddingVertical: 20, flex: 1 }}>
-                <FlatList
-                    data={mappedCart}
-                    keyExtractor={(item) => item?.product_id}
-                    renderItem={renderItem}
-                    showsVerticalScrollIndicator={false}
-                    contentContainerStyle={{
-                        paddingBottom: mappedCart?.length > 0 ? 150 : 60
-                    }}
-                />
+                {mappedCart?.length > 0 ? (
+                    <FlatList
+                        data={mappedCart}
+                        keyExtractor={(item) => item?.product_id}
+                        renderItem={renderItem}
+                        showsVerticalScrollIndicator={false}
+                        contentContainerStyle={{
+                            paddingBottom: mappedCart?.length > 0 ? 70 : 60
+                        }}
+                    />
+                ) : (
+                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', gap: 20 }}>
+                        <NoOrder />
+                    </View>
+                )}
                 {renderCheckout}
             </View>
-            {console.log('cartData', cartData?.infoState.delItem)}
             <BottomSheet
                 visible={cartData?.infoState?.delBottomSheet}
                 onClose={() => setCartData(prev => ({

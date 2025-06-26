@@ -6,6 +6,7 @@ export const ColorPalatte = {
 
     errorclr: '#DB3B21',
     placeHolderClr: '#ABABAB',
+    successClr: '#1AAA55',
 
     primaryClr: '#429539', //green
     secondaryClr: '#F37421', //orange
@@ -19,6 +20,7 @@ export const ColorPalatte = {
     grey_100: '#C6C6C6',
     grey_200: '#ABABAB',
     grey_300: '#848484',
+    grey_400: '#6D6D6D',
 
     // Primary Foundation Color
     primaryClr_50: '#ECF4EB',

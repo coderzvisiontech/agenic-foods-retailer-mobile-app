@@ -49,8 +49,9 @@ const RegisterScreen = ({ route }) => {
             lng: '',
             lat: "",
         },
-        validationSchema: RegisterSchema,
+        // validationSchema: RegisterSchema,
         onSubmit: (values) => {
+            console.log('values', values)
             const payload = {
                 first_name: values?.first_name,
                 last_name: values?.last_name,
@@ -182,7 +183,13 @@ const RegisterScreen = ({ route }) => {
                                 label="Upload a Document"
                                 placeholder="Choose a file"
                                 type="upload"
-                                onChangeText={(uri) => formik.setFieldValue('document', uri)}
+                                onChangeText={(uri) =>
+                                    formik.setFieldValue('document', {
+                                        uri: uri,
+                                        fileName: uri?.split('/').pop(),
+                                        type: 'image/jpeg',
+                                    })
+                                }
                                 onBlur={formik.handleBlur('document')}
                                 value={formik.values.document}
                                 error={formik.touched.document && formik.errors.document}
@@ -201,6 +208,7 @@ const RegisterScreen = ({ route }) => {
                                 title="Create an Account"
                                 type="largePrimary"
                                 onPress={formik.handleSubmit}
+                                disable={registerData?.infoState?.loading}
                             />
                         </View>
                     </ScrollView>

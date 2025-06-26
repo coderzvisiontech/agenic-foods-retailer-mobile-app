@@ -12,7 +12,6 @@ export const RegisterSchema = Yup.object().shape({
         fileName: Yup.string(),
         type: Yup.string(),
     }),
-
 });
 
 export const LoginSchema = Yup.object().shape({

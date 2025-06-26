@@ -33,19 +33,21 @@ export const styles = StyleSheet.create({
     ...baseText,
     fontSize: FONT_SIZES.h3,
     fontFamily: 'Outfit-SemiBold',
-
   },
   h4: {
     ...baseText,
     fontSize: FONT_SIZES.h4,
+    fontFamily: 'Outfit-Medium',
   },
   h5: {
     ...baseText,
     fontSize: FONT_SIZES.h5,
+    fontFamily: 'Outfit-Medium',
   },
   h6: {
     ...baseText,
     fontSize: FONT_SIZES.h6,
+    
   },
   p: {
     ...baseText,

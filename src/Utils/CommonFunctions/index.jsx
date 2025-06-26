@@ -16,3 +16,7 @@ export const requestGalleryPermission = async () => {
     Alert.alert('Permission Required', 'Please allow photo access from settings.');
     return false;
 };
+
+export const formatList = (list = []) => {
+    return list.join(', ');
+};

@@ -119,24 +119,21 @@ const LoginScreen = () => {
                             alignBg
                         >
                             <View style={{ justifyContent: "space-between", height: 275, flex: 1 }}>
-
                                 <View style={{ alignItems: 'center', paddingVertical: 20 }}>
                                     <Typo type='h2' title='Welcome to Get Fresh' />
                                     <Typo type='p' title='Enter your phone number' />
                                 </View>
 
-                                <View>
-                                    <TextInput
-                                        label="Mobile Number"
-                                        placeholder="Enter Mobile Number"
-                                        keyboardType="phone-pad"
-                                        type='phonenumber'
-                                        onChangeText={formik.handleChange('phone')}
-                                        onBlur={formik.handleBlur('phone')}
-                                        value={formik.values.phone}
-                                        error={formik.touched.phone && formik.errors.phone}
-                                    />
-                                </View>
+                                <TextInput
+                                    label="Mobile Number"
+                                    placeholder="Enter Mobile Number"
+                                    keyboardType="phone-pad"
+                                    type='phonenumber'
+                                    onChangeText={formik.handleChange('phone')}
+                                    onBlur={formik.handleBlur('phone')}
+                                    value={formik.values.phone}
+                                    error={formik.touched.phone && formik.errors.phone}
+                                />
 
                                 <ButtonComp
                                     title="Log In"

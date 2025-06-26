@@ -13,6 +13,8 @@ import BottomSheet from "./BottomSheet";
 import Toast from "./Toast";
 import Avatar from "./Avatar";
 import BottomCard from "./BottomCard";
+import OrderCard from "./OrderCard";
+import StatusTracking from "./StatusTracking";
 
 
 export {
@@ -30,5 +32,7 @@ export {
     BottomSheet,
     Toast,
     Avatar,
-    BottomCard
+    BottomCard,
+    OrderCard,
+    StatusTracking
 }
