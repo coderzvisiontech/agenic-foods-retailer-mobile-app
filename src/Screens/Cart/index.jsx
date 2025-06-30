@@ -191,7 +191,7 @@ import { showToast } from '../../Utils/Helper/toastHelper';
 
 const { height } = Dimensions.get('window');
 
-const CartScreen = ({ isCart = true }) => {
+const CartScreen = () => {
     const navigation = useNavigation();
     const dispatch = useDispatch();
 

@@ -6,8 +6,29 @@ import { ColorPalatte, FontSize } from '../../Themes'
 import { Typo } from "../../Components"
 import { BlackRIght } from '../../Config/ImgConfig'
 import { formatList } from '../../Utils/CommonFunctions'
+import { ColorCard } from './style'
 
 const OrderCard = ({ data, onOrderPress, isOrder = true }) => {
+
+    const getStatusColorKey = (status = '') => {
+        switch (status.toLowerCase()) {
+            case 'new order':
+                return 'newOrder';
+            case 'order packed':
+                return 'orderPacked';
+            case 'on the way':
+                return 'onTheWay';
+            case 'completed':
+                return 'completed';
+            default:
+                return 'newOrder';
+        }
+    };
+
+    const statusKey = getStatusColorKey(data?.order_status);
+    const backgroundColor = ColorCard[`${statusKey}_bg`];
+    const textColor = ColorCard[`${statusKey}_txt`];
+
     return (
         <TouchableOpacity style={styles.container} onPress={onOrderPress}>
             <Image
@@ -21,21 +42,27 @@ const OrderCard = ({ data, onOrderPress, isOrder = true }) => {
             <View style={{ flex: 1 }}>
                 {isOrder ? (
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <Typo style={{ fontSize: FontSize.fontSize18 }} title={data?.order_status} />
+                        <Typo
+                            style={[styles.orderStatus, {
+                                backgroundColor: backgroundColor,
+                                color: textColor
+                            }]}
+                            title={data?.order_status}
+                        />
                         <BlackRIght style={{ color: 'black' }} />
                     </View>
                 ) : (
                     <Typo ellipsis={true} tailWidth={180} style={{ fontSize: FontSize.fontSize18, fontFamily: 'Outfit-Medium' }} title={data?.cartDetail?.length > 1 ? formatList(data?.cartDetail?.map((el) => el?.product)) : data?.cartDetail?.[0]?.product} />
                 )}
                 {isOrder ? (
-                    <Typo tailWidth={170} ellipsis={true} style={styles.orderName} title={data?.productDetail?.length > 1 ? formatList(data?.productDetail) : data?.productDetail} />
+                    <Typo tailWidth={170} ellipsis={true} style={styles.orderName} title={data?.productDetail?.length > 1 ? `${data?.productDetail?.[0]} +${data?.productDetail?.length - 1}` : data?.productDetail} />
                 ) : (
                     <Typo style={styles.orderQty} title={`Qty: ${data?.cartDetail?.length}`} />
                 )}
                 {isOrder ? (
                     <Typo style={styles.orderId} title={`Order Id: ${data?.order_id}`} />
                 ) : (
-                    <Typo style={styles.price} type='h4' title={`₹${data?.grand_total}`} />
+                    <Typo style={{ fontFamily: 'Outfit-Bold' }} type='h4' title={`₹${data?.grand_total}`} />
                 )}
             </View>
         </TouchableOpacity>
@@ -73,8 +100,11 @@ const styles = StyleSheet.create({
         fontFamily: 'Outfit-Regular',
         paddingBottom: 15
     },
-    price: {
-        fontFamily: 'Outfit-Bold'
+    orderStatus: {
+        fontSize: FontSize.fontSize12,
+        paddingVertical: 4,
+        paddingHorizontal: 8,
+        borderRadius: 8
     }
 })
 

@@ -1,5 +1,7 @@
 import React, { useState, useMemo, useCallback } from 'react'
-import { View, StyleSheet, FlatList } from 'react-native'
+import { View, StyleSheet, FlatList, Image } from 'react-native'
+import { VITE_UPLOAD_IMG } from "@env"
+
 import { RadioButton, Typo } from '../../../../Components'
 import { Cash } from '../../../../Config/ImgConfig';
 import { ColorPalatte } from '../../../../Themes';
@@ -8,7 +10,7 @@ const PaymentMethods = ({ data, onSelect }) => {
     const [selectedValue, setSelectedValue] = useState(null);
 
     const renderCard = useCallback(({ item }) => {
-        const isSelected = selectedValue === item.title;
+        const isSelected = selectedValue === item?.id;
 
         return (
             <View style={styles.container}>
@@ -16,13 +18,21 @@ const PaymentMethods = ({ data, onSelect }) => {
                     <RadioButton
                         value={isSelected}
                         onChange={() => {
-                            setSelectedValue(item.title);
-                            onSelect?.(item.title);
+                            setSelectedValue(item?.id);
+                            onSelect?.(item);
                         }}
                     />
-                    <Typo style={styles.title} title={item?.title} />
+                    <Typo style={styles.title} title={item?.method} />
                 </View>
-                {item?.icon}
+                {/* <Image
+                    source={
+                        item?.image ? { uri: `${VITE_UPLOAD_IMG}${item?.image}` } : require('../../../../Assets/Images/otp_bg.jpg')
+                    }
+                    resizeMode="contain"
+                    style={styles.image}
+                /> */}
+                {/* {item?.icon} */}
+                <Cash />
             </View>
         );
     }, [selectedValue, onSelect]);
@@ -30,7 +40,7 @@ const PaymentMethods = ({ data, onSelect }) => {
     return (
         <FlatList
             data={data}
-            keyExtractor={(item) => item.title}
+            keyExtractor={(item) => item.id}
             renderItem={renderCard}
         />
     );

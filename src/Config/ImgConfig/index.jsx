@@ -18,7 +18,6 @@ import DecrementIcon from "../../Assets/Icons/decrement_icon.svg"
 import IncrementIcon from "../../Assets/Icons/increment_icon.svg"
 import SearchIcon from "../../Assets/Icons/search_icon.svg"
 import RightIcon from "../../Assets/Icons/right_icon.svg"
-import DeleteIcon from "../../Assets/Icons/delete_icon.svg"
 import ToastIcon from "../../Assets/Icons/toast_logo.svg"
 import UserIcon from "../../Assets/Icons/user_icon.svg"
 import OrderIcon from "../../Assets/Icons/order_icon.svg"
@@ -35,6 +34,13 @@ import NoCart from "../../Assets/Icons/no_cart.svg"
 import UpIcon from "../../Assets/Icons/up_icon.svg"
 import DownIcon from "../../Assets/Icons/down_icon.svg"
 import Cash from "../../Assets/Icons/cash.svg"
+import NoNotification from "../../Assets/Icons/no_notification.svg"
+import NotifyTag from "../../Assets/Icons/notify_tag.svg"
+import GoldCoin from "../../Assets/Icons/gold_coin.svg"
+import ClearIcon from '../../Assets/Icons/clear_icon.svg'
+import OrderDelivered from "../../Assets/Icons/order_delivered.svg"
+import OrderOntheway from "../../Assets/Icons/order_ontheway.svg"
+import OrderPacked from "../../Assets/Icons/order_packed.svg"
 
 // Home Icon
 const HomeIcon = ({ color = ColorPalatte.grey_300, ...props }) => (
@@ -141,6 +147,22 @@ const ProfileIcon = ({ color = ColorPalatte.grey_300, ...props }) => (
     </Svg>
 )
 
+//Delete Icon
+const DeleteIcon = ({ color = ColorPalatte.errorclr, ...props }) => (
+    <Svg
+        xmlns="http://www.w3.org/2000/svg"
+        width={19}
+        height={20}
+        fill="none"
+        {...props}
+    >
+        <Path
+            fill={color}
+            d="M7.5 3.25v.25h4v-.25a2 2 0 1 0-4 0Zm-1.25.25v-.25a3.25 3.25 0 0 1 6.5 0v.25h5.625a.625.625 0 1 1 0 1.25h-1.459l-1 11.928A3.625 3.625 0 0 1 12.304 20H6.696a3.625 3.625 0 0 1-3.612-3.322l-1-11.928H.625a.625.625 0 0 1 0-1.25H6.25ZM4.33 16.573a2.375 2.375 0 0 0 2.366 2.177h5.608a2.375 2.375 0 0 0 2.367-2.177l.991-11.823H3.338l.992 11.823Zm3.92-8.448a.625.625 0 0 0-1.25 0v7.25a.625.625 0 0 0 1.25 0v-7.25Zm3.125-.625c.345 0 .625.28.625.625v7.25a.624.624 0 1 1-1.25 0v-7.25c0-.345.28-.625.625-.625Z"
+        />
+    </Svg>
+)
+
 export {
     Logo,
     Cart,
@@ -157,7 +179,6 @@ export {
     IncrementIcon,
     SearchIcon,
     RightIcon,
-    DeleteIcon,
     ToastIcon,
     UserIcon,
     OrderIcon,
@@ -174,8 +195,16 @@ export {
     UpIcon,
     DownIcon,
     Cash,
+    NoNotification,
+    NotifyTag,
+    GoldCoin,
+    ClearIcon,
+    OrderDelivered,
+    OrderOntheway,
+    OrderPacked,
     HomeIcon,
     CartIcon,
     NotificationIcon,
-    ProfileIcon
+    ProfileIcon,
+    DeleteIcon,
 }

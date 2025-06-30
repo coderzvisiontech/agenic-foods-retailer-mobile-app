@@ -3,9 +3,9 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { VITE_API_URL } from "@env"
 
-export const orderList = createAsyncThunk(
-    "getfresh/order/list",
-    async (dataObject, { rejectWithValue }) => {
+export const notificationList = createAsyncThunk(
+    "getfresh/notification/list",
+    async (_, { rejectWithValue }) => {
         const token = await AsyncStorage.getItem('token');
         const config = {
             headers: {
@@ -15,7 +15,7 @@ export const orderList = createAsyncThunk(
         }
 
         try {
-            const response = await axios.get(`${VITE_API_URL}/order?start=${dataObject?.start}&limit=${dataObject?.limit}`, config);
+            const response = await axios.get(`${VITE_API_URL}/notification`, config);
             return response;
         } catch (error) {
             if (error?.response && error?.response?.data) {
@@ -29,8 +29,8 @@ export const orderList = createAsyncThunk(
     }
 );
 
-export const orderDetails = createAsyncThunk(
-    "getfresh/order/details",
+export const notificationDetail = createAsyncThunk(
+    "getfresh/notification/detail",
     async (dataObject, { rejectWithValue }) => {
         const token = await AsyncStorage.getItem('token');
         const config = {
@@ -41,34 +41,7 @@ export const orderDetails = createAsyncThunk(
         }
 
         try {
-            const response = await axios.get(`${VITE_API_URL}/order/${dataObject?.id}`, config);
-            return response;
-        } catch (error) {
-
-            if (error?.response && error?.response?.data) {
-                return rejectWithValue(error?.response?.data);
-            } else {
-                return rejectWithValue({
-                    message: error,
-                });
-            }
-        }
-    }
-);
-
-export const placeOrder = createAsyncThunk(
-    "getfresh/order/place",
-    async (dataObject, { rejectWithValue }) => {
-        const token = await AsyncStorage.getItem('token');
-        const config = {
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `${token}`,
-            }
-        }
-
-        try {
-            const response = await axios.post(`${VITE_API_URL}/order`, dataObject, config);
+            const response = await axios.get(`${VITE_API_URL}/notification`, dataObject, config);
             return response;
         } catch (error) {
             if (error?.response && error?.response?.data) {

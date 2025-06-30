@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { FlatList, SafeAreaView, StyleSheet, View } from 'react-native'
 import { useFocusEffect, useNavigation } from '@react-navigation/native'
@@ -13,26 +13,48 @@ const OrderDeatils = () => {
     const dispatch = useDispatch();
     const { order } = useSelector(state => state.order);
 
+    const [pagination, setPagination] = useState({
+        start: 0,
+        limit: 10,
+    })
+
     useFocusEffect(useCallback(() => {
-        dispatch(orderList())
-    }, [dispatch]));
+        dispatch(orderList(pagination))
+    }, []));
 
     const renderItem = useCallback(({ item }) => {
+        const deliveryStatus = {
+            order_status: item?.order_status,
+            outofDelivery: item?.outofDelivery
+        }
         return (
             <OrderCard
                 data={item}
-                onOrderPress={() => navigation.navigate('OrderDetailScreen', { id: item?.id })}
+                onOrderPress={() => navigation.navigate('OrderDetailScreen', { id: item?.id, deliveryStatus: deliveryStatus })}
             />
         );
     }, []);
 
     const orderData = useMemo(() => {
-        return order?.response?.document?.map((item) => ({
+        return order?.response?.documentData?.map((item) => ({
             ...item,
             id: item?.id,
-            cartCount: item?.cart,
+            cartCount: item?.cartCount,
         })) || [];
     }, [order]);
+
+    const fetchOrders = useCallback((pagination) => {
+        dispatch(orderList({ start: pagination.start, limit: pagination.limit }));
+    }, [dispatch]);
+
+
+    const handleLoadMore = useCallback(() => {
+        setPagination((prev) => {
+            const updated = { ...prev, start: prev.start * prev.limit };
+            fetchOrders(updated);
+            return updated;
+        });
+    }, [fetchOrders]);
 
     return (
         <SafeAreaView style={styles.container}>
@@ -46,9 +68,11 @@ const OrderDeatils = () => {
                 {orderData?.length > 0 ? (
                     <FlatList
                         data={orderData}
-                        keyExtractor={(item) => item.id}
+                        keyExtractor={(item) => item?.id}
                         renderItem={renderItem}
                         showsVerticalScrollIndicator={false}
+                        onEndReachedThreshold={0.5}
+                        onEndReached={handleLoadMore}
                     />
                 ) : (
                     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', gap: 20 }}>

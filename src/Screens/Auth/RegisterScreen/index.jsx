@@ -49,14 +49,14 @@ const RegisterScreen = ({ route }) => {
             lng: '',
             lat: "",
         },
-        // validationSchema: RegisterSchema,
+        validationSchema: RegisterSchema,
         onSubmit: (values) => {
             console.log('values', values)
             const payload = {
                 first_name: values?.first_name,
                 last_name: values?.last_name,
                 email: values?.email,
-                code: '91',
+                code: '+91',
                 number: values?.number,
                 shop_name: values?.shop_name,
                 line1: '6th avenue',
@@ -74,7 +74,6 @@ const RegisterScreen = ({ route }) => {
                 ...prev,
                 infoState: { loading: true }
             }))
-            console.log('payload', payload)
             dispatch(authSignup(payload)).then((res) => {
                 console.log('res', res)
                 if (res?.payload?.data?.status) {
@@ -179,28 +178,35 @@ const RegisterScreen = ({ route }) => {
                                 error={formik.touched.address && formik.errors.address}
                                 isMandatory
                             />
+                            {console.log('formik.values.document', formik.values.document)}
                             <TextInput
                                 label="Upload a Document"
                                 placeholder="Choose a file"
                                 type="upload"
-                                onChangeText={(uri) =>
+                                onChangeText={(file) => {
                                     formik.setFieldValue('document', {
-                                        uri: uri,
-                                        fileName: uri?.split('/').pop(),
-                                        type: 'image/jpeg',
+                                        uri: file?.uri,
+                                        fileName: file?.fileName || file?.name,
+                                        type: file?.type,
                                     })
-                                }
+                                }}
                                 onBlur={formik.handleBlur('document')}
-                                value={formik.values.document}
-                                error={formik.touched.document && formik.errors.document}
+                                value={formik.values.document?.fileName}
+                                error={formik.touched.document && formik.errors.document?.uri}
                                 isMandatory
                             />
                             <TextInput
                                 label="Upload a Shop Image"
                                 type="upload"
                                 placeholder="Upload Shop Image"
-                                onChangeText={(uri) => formik.setFieldValue('shop_images', uri)}
-                                value={formik.values.shop_images}
+                                onChangeText={(file) => {
+                                    formik.setFieldValue('shop_images', {
+                                        uri: file?.uri,
+                                        fileName: file?.fileName || file?.name,
+                                        type: file?.type,
+                                    })
+                                }}
+                                value={formik.values.shop_images?.fileName}
                                 selectionLimit={5}
                             />
 

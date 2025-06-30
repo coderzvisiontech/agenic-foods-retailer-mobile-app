@@ -1,11 +1,12 @@
 import React from 'react'
-import { View, TouchableOpacity } from 'react-native'
+import { View, TouchableOpacity, StyleSheet } from 'react-native'
 import Feather from 'react-native-vector-icons/Feather';
 
 import { BackIcon } from '../../Config/ImgConfig'
 import { Typo } from "../../Components"
+import { ColorPalatte } from '../../Themes';
 
-const SecondaryHeader = ({ isBack, screenName, onPressBack, onRefresh }) => {
+const SecondaryHeader = ({ isBack, screenName, onPressBack, onRefresh, isClear, onClear }) => {
     return (
         <View style={{ flexDirection: 'row', alignItems: "center", position: 'relative', justifyContent: 'space-between' }}>
             <View style={{ flexDirection: 'row', alignItems: "center", position: 'relative' }}>
@@ -24,8 +25,20 @@ const SecondaryHeader = ({ isBack, screenName, onPressBack, onRefresh }) => {
                     <Feather name="refresh-cw" color="#000" size={18} />
                 </TouchableOpacity>
             )}
+            {isClear && (
+                <TouchableOpacity onPress={onClear}>
+                    <Typo style={styles.clearAll} title={'Clear All'} />
+                </TouchableOpacity>
+            )}
         </View>
     )
 }
+
+const styles = StyleSheet.create({
+    clearAll: {
+        fontFamily: 'Outfit-Medium',
+        color: ColorPalatte.secondaryClr
+    }
+})
 
 export default SecondaryHeader

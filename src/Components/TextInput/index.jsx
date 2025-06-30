@@ -1,19 +1,24 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     TextInput,
     View,
     Text,
     StyleSheet,
     TouchableOpacity,
+    Image,
+    Dimensions
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { launchImageLibrary } from 'react-native-image-picker';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import { Typo } from "../../Components";
 import { ColorPalatte, FontSize } from '../../Themes';
 import { UploadIcon, CloseIcon, SearchIcon } from '../../Config/ImgConfig';
 import { requestGalleryPermission } from '../../Utils/CommonFunctions';
+
+const { height, width } = Dimensions.get('window')
 
 const TextInputComp = ({
     placeholder = '',
@@ -32,15 +37,18 @@ const TextInputComp = ({
     ...rest
 }) => {
     const [secure, setSecure] = useState(type === 'password');
+    const [previewVisible, setPreviewVisible] = useState(false);
+    const [fileData, setFileData] = useState(null);
 
     const handleUploadPress = async () => {
         const granted = await requestGalleryPermission();
         if (!granted) return;
         launchImageLibrary({ mediaType: 'photo', selectionLimit: 1 }, (response) => {
-            console.log('response------->', response)
-            if (response.assets && response.assets.length > 0) {
-                const image = response.assets[0];
+            if (response?.assets && response?.assets?.length > 0) {
+                const image = response?.assets?.[0];
+                const image2 = response?.assets
                 onChangeText(image);
+                setFileData(image2);
             }
         });
     };
@@ -98,68 +106,99 @@ const TextInputComp = ({
     };
 
     return (
-        <View style={[styles.container, style]}>
-            {label && (
-                <View style={styles.labelwrapper}>
-                    <Typo title={label} style={styles.label} />
-                    {isMandatory && (
-                        <Text
-                            style={{
-                                color: ColorPalatte?.errorclr,
-                                transform: [{ translateY: -2 }],
-                            }}
-                        >
-                            *
-                        </Text>
-                    )}
-                </View>
-            )}
-            <View style={styles.inputWrapper}>
-                {renderLeftIcon()}
-
-                {type === 'upload' ? (
-                    <TouchableOpacity
-                        style={[styles.uploadBox, inputStyle]}
-                        onPress={handleUploadPress}
-                        activeOpacity={0.8}
-                        disabled={!editable}
-                    >
-                        <View style={styles.uploadContent}>
-                            <UploadIcon name="image" size={20} color={ColorPalatte.blackClr} style={{ marginRight: 8 }} />
+        <>
+            <View style={[styles.container, style]}>
+                {label && (
+                    <View style={styles.labelwrapper}>
+                        <Typo title={label} style={styles.label} />
+                        {isMandatory && (
                             <Text
                                 style={{
-                                    flex: 1,
-                                    color: value ? ColorPalatte.blackClr : ColorPalatte.placeHolderClr,
+                                    color: ColorPalatte?.errorclr,
+                                    transform: [{ translateY: -2 }],
                                 }}
-                                numberOfLines={1}
                             >
-                                {value?.fileName || value?.name || placeholder}
+                                *
                             </Text>
-                        </View>
-                        {value?.length > 0 && (
-                            <TouchableOpacity onPress={() => onChangeText('')}>
-                                <CloseIcon name="close" size={20} color={ColorPalatte.blackClr} />
-                            </TouchableOpacity>
                         )}
-                    </TouchableOpacity>
-                ) : (
-                    <TextInput
-                        style={[styles.input, inputStyle]}
-                        placeholder={placeholder}
-                        placeholderTextColor={ColorPalatte.placeHolderClr}
-                        value={value}
-                        onChangeText={onChangeText}
-                        secureTextEntry={secure}
-                        keyboardType={getKeyboardType()}
-                        editable={editable}
-                        {...rest}
-                    />
+                    </View>
                 )}
+                <View style={styles.inputWrapper}>
+                    {renderLeftIcon()}
 
-                {renderRightIcon()}
+                    {type === 'upload' ? (
+                        <>
+                            <TouchableOpacity
+                                style={[styles.uploadBox, inputStyle]}
+                                onPress={handleUploadPress}
+                                activeOpacity={0.8}
+                                disabled={!editable}
+                            >
+                                <View style={styles.uploadContent}>
+                                    <UploadIcon name="image" size={20} color={ColorPalatte.blackClr} style={{ marginRight: 8 }} />
+                                    <Text
+                                        style={{
+                                            flex: 1,
+                                            color: value ? ColorPalatte.blackClr : ColorPalatte.placeHolderClr,
+                                        }}
+                                        numberOfLines={1}
+                                    >
+                                        {value || placeholder}
+                                    </Text>
+                                </View>
+                                {value?.length > 0 && (
+                                    <TouchableOpacity
+                                        onPress={() => {
+                                            setFileData(null);
+                                            onChangeText(null);
+                                        }}
+                                    >
+                                        <CloseIcon name="close" size={20} color={ColorPalatte.blackClr} />
+                                    </TouchableOpacity>
+                                )}
+                            </TouchableOpacity>
+
+                        </>
+                    ) : (
+                        <TextInput
+                            style={[styles.input, inputStyle]}
+                            placeholder={placeholder}
+                            placeholderTextColor={ColorPalatte.placeHolderClr}
+                            value={value}
+                            onChangeText={onChangeText}
+                            secureTextEntry={secure}
+                            keyboardType={getKeyboardType()}
+                            editable={editable}
+                            {...rest}
+                        />
+                    )}
+
+                    {renderRightIcon()}
+                </View>
+                {type === 'upload' && (
+                    <TouchableOpacity onPress={() => setPreviewVisible(true)}>
+                        <Text style={styles.clickTxt} >Click to View</Text>
+                    </TouchableOpacity>
+                )}
+                {error ? <Text style={styles.error}>{error}</Text> : null}
+
             </View>
-            {error ? <Text style={styles.error}>{error}</Text> : null}
-        </View>
+            {previewVisible && fileData && (
+                <View style={styles.modalWrapper}>
+                    <TouchableOpacity style={styles.modalBackdrop} onPress={() => setPreviewVisible(false)} />
+                    <TouchableOpacity style={{ alignItems: 'flex-end', marginRight: 20 }} onPress={() => setPreviewVisible(false)}>
+                        <Ionicons name="close-circle-outline" color={ColorPalatte.whiteClr} size={28} />
+                    </TouchableOpacity>
+                    <View style={styles.modalContent}>
+                        <Image
+                            source={{ uri: fileData?.[0]?.uri }}
+                            style={styles.previewImage}
+                            resizeMode="contain"
+                        />
+                    </View>
+                </View>
+            )}
+        </>
     );
 };
 
@@ -229,6 +268,54 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         columnGap: 2,
     },
+    clickTxt: {
+        color: ColorPalatte.primaryClr,
+        textDecorationLine: 'underline',
+        fontFamily: 'Outfit-Regular',
+        fontSize: FontSize.fontSize12,
+        paddingTop: 5
+    },
+
+    modalWrapper: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        bottom: 0,
+        right: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.6)',
+        justifyContent: 'center',
+        zIndex: 999,
+    },
+
+    modalBackdrop: {
+        ...StyleSheet.absoluteFillObject,
+    },
+
+    modalContent: {
+        borderRadius: 10,
+        padding: 10,
+        alignItems: 'center',
+    },
+
+    previewImage: {
+        width: width * 0.8,
+        height: height * 0.8,
+        borderRadius: 8,
+        marginBottom: 10,
+    },
+
+    closeBtn: {
+        paddingVertical: 6,
+        paddingHorizontal: 20,
+        backgroundColor: ColorPalatte.primaryClr,
+        borderRadius: 6,
+    },
+
+    closeText: {
+        color: 'white',
+        fontWeight: '600',
+    },
+
 });
 
 export default TextInputComp;

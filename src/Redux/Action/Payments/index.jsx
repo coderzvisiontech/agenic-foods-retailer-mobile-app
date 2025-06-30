@@ -3,9 +3,9 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { VITE_API_URL } from "@env"
 
-export const orderList = createAsyncThunk(
-    "getfresh/order/list",
-    async (dataObject, { rejectWithValue }) => {
+export const paymentOptions = createAsyncThunk(
+    "getfresh/payment/options",
+    async (_, { rejectWithValue }) => {
         const token = await AsyncStorage.getItem('token');
         const config = {
             headers: {
@@ -15,33 +15,7 @@ export const orderList = createAsyncThunk(
         }
 
         try {
-            const response = await axios.get(`${VITE_API_URL}/order?start=${dataObject?.start}&limit=${dataObject?.limit}`, config);
-            return response;
-        } catch (error) {
-            if (error?.response && error?.response?.data) {
-                return rejectWithValue(error?.response?.data);
-            } else {
-                return rejectWithValue({
-                    message: error,
-                });
-            }
-        }
-    }
-);
-
-export const orderDetails = createAsyncThunk(
-    "getfresh/order/details",
-    async (dataObject, { rejectWithValue }) => {
-        const token = await AsyncStorage.getItem('token');
-        const config = {
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `${token}`,
-            }
-        }
-
-        try {
-            const response = await axios.get(`${VITE_API_URL}/order/${dataObject?.id}`, config);
+            const response = await axios.get(`${VITE_API_URL}/payment/option `, config);
             return response;
         } catch (error) {
 
@@ -56,8 +30,8 @@ export const orderDetails = createAsyncThunk(
     }
 );
 
-export const placeOrder = createAsyncThunk(
-    "getfresh/order/place",
+export const proceedPayment = createAsyncThunk(
+    "getfresh/payment",
     async (dataObject, { rejectWithValue }) => {
         const token = await AsyncStorage.getItem('token');
         const config = {
@@ -68,9 +42,10 @@ export const placeOrder = createAsyncThunk(
         }
 
         try {
-            const response = await axios.post(`${VITE_API_URL}/order`, dataObject, config);
+            const response = await axios.post(`${VITE_API_URL}/payment`, dataObject, config);
             return response;
         } catch (error) {
+
             if (error?.response && error?.response?.data) {
                 return rejectWithValue(error?.response?.data);
             } else {

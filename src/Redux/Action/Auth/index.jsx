@@ -2,6 +2,8 @@ import axios from "axios";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { VITE_API_URL } from "@env"
 
+
+
 export const authLogin = createAsyncThunk(
     "getfresh/login",
     async (dataObject, { rejectWithValue }) => {
@@ -12,11 +14,10 @@ export const authLogin = createAsyncThunk(
             }
         }
 
-        try {            
+        try {                        
             const response = await axios.post(`${VITE_API_URL}/auth/login`, dataObject, config);
             return response;
         } catch (error) {
-          
             if (error?.response && error?.response?.data) {
                 return rejectWithValue(error?.response?.data);
             } else {

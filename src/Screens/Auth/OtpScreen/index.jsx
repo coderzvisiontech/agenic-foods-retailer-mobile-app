@@ -50,7 +50,7 @@ const OtpScreen = ({ route }) => {
             Keyboard.dismiss()
             const payload = {
                 phone: {
-                    code: '91',
+                    code: '+91',
                     number: phone
                 },
                 otp: values?.otp,
@@ -73,6 +73,17 @@ const OtpScreen = ({ route }) => {
                             await AsyncStorage.setItem('full_name', `${res?.payload?.data?.response?.[0]?.first_name} ${res?.payload?.data?.response?.[0]?.last_name}`)
                             await AsyncStorage.setItem('user_id', res?.payload?.data?.response?.[0]?._id)
                             await AsyncStorage.setItem('phone_number', res?.payload?.data?.response?.[0]?.phone?.number)
+                            await AsyncStorage.setItem('available_address', res?.payload?.data?.response?.[0]?.availability_address)
+                            await AsyncStorage.setItem(
+                                'location',
+                                JSON.stringify(res?.payload?.data?.response?.[0]?.location)
+                            );
+
+                            await AsyncStorage.setItem(
+                                'address',
+                                JSON.stringify(res?.payload?.data?.response?.[0]?.address)
+                            );
+
                             setTimeout(() => {
                                 navigation.navigate('BottomTab', { screen: 'Home' })
                             }, 1500)

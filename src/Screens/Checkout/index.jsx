@@ -11,12 +11,13 @@ import { PriceDetails } from '../Order/Components'
 import { getISTFullDate } from '../../Utils/CommonFunctions'
 import { orderList, placeOrder } from '../../Redux/Action/Order'
 import { showToast } from '../../Utils/Helper/toastHelper'
+import useUserData from '../../Hooks/useFetchUser'
 
 const CheckoutScreen = () => {
     const navigation = useNavigation();
     const dispatch = useDispatch();
     const { cart } = useSelector(state => state.cart);
-    const { order } = useSelector(state => state.order);
+    const { user } = useUserData();
 
     const [checkoutData, setCheckoutData] = useState({
         timeSlot: [],
@@ -59,25 +60,34 @@ const CheckoutScreen = () => {
         }))
 
         const payload = {
-            slottime: `${checkoutData.selectedSlot.starttime} - ${checkoutData.selectedSlot.endtime}`,
+            slottime: `${checkoutData?.selectedSlot?.starttime} - ${checkoutData?.selectedSlot?.endtime}`,
             cart_detail: cartItems,
             sub_total: cart?.total,
             grand_total: cart?.total,
             delivery_charges: cart?.delivery_charges,
-            location: {},
+            location: user?.location,
             sheduledate: checkoutData?.sheduledate,
-            address: {},
-            availability_address: {}
+            address: user?.address,
+            availability_address: user?.availability_address
         }
-        if (!checkoutData.selectedSlot.starttime && !checkoutData.selectedSlot.endtime && !checkoutData.sheduledate) {
+        if (!checkoutData?.selectedSlot?.starttime && !checkoutData?.selectedSlot?.endtime && !checkoutData?.sheduledate) {
             showToast('error', 'Please select Slot Date for delivery');
             return;
         }
+
         dispatch(placeOrder(payload)).then((res) => {
             if (res?.payload?.status === 200) {
                 showToast('success', 'Please proceed with payment')
                 setTimeout(() => {
-                    navigation.navigate('PaymentScreen', { data: { products: mappedData, deliveryCharges: cart?.delivery_charges, deliveryTotal: cart?.total } })
+                    navigation.navigate('PaymentScreen', {
+                        data: {
+                            products: mappedData,
+                            deliveryCharges: cart?.delivery_charges,
+                            deliveryTotal: cart?.total,
+                            timeSlot: `${checkoutData?.selectedSlot?.starttime} - ${checkoutData?.selectedSlot?.endtime}`,
+                            orderId: res?.payload?.data?.response
+                        }
+                    })
                 }, 1000)
             } else if (res?.payload?.status) {
                 showToast('error', res?.payload?.message)
@@ -95,7 +105,7 @@ const CheckoutScreen = () => {
                     contentContainerStyle={{ paddingVertical: 20, gap: 24, paddingBottom: 100 }}
                     showsVerticalScrollIndicator={false}
                 >
-                    <AddressCard />
+                    <AddressCard user={user} />
                     <View style={{ gap: 5 }}>
                         <Typo type='h5' title={'Slot Date'} />
                         <TimeSlotCart

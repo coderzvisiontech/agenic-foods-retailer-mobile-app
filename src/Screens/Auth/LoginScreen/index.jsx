@@ -62,7 +62,7 @@ const LoginScreen = () => {
                 ...prev,
                 infoState: { loading: true }
             }))
-            dispatch(authLogin({ phone: { code: "91", number: values?.phone } })).then((res) => {
+            dispatch(authLogin({ phone: { code: "+91", number: values?.phone } })).then((res) => {
                 console.log('res', res)
                 if (res?.payload?.data?.status === 0) {
                     setLoginData((prev) => ({

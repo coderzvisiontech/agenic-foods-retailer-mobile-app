@@ -28,7 +28,7 @@ const PriceDetails = ({ deliveryCharges, data, totalPrice, isOpen = true }) => {
         }
     ];
 
-    details.push(...data, ...delivery);
+    details?.push(...data, ...delivery);
 
     const toggleExpand = () => {
         LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);

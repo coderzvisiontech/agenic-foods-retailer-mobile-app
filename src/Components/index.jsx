@@ -16,6 +16,7 @@ import BottomCard from "./BottomCard";
 import OrderCard from "./OrderCard";
 import StatusTracking from "./StatusTracking";
 import RadioButton from "./RadioButton";
+import NotificationCard from "./NotificationCard";
 
 
 export {
@@ -36,5 +37,6 @@ export {
     BottomCard,
     OrderCard,
     StatusTracking,
-    RadioButton
+    RadioButton,
+    NotificationCard
 }

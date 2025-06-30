@@ -2,7 +2,6 @@ import React from 'react';
 import {
     SafeAreaView,
     StyleSheet,
-    Text,
     View,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -17,6 +16,7 @@ import {
     TextInput
 } from '../../../../Components';
 import { ProfileSchema } from '../../../../Utils/ValidationSchema';
+import CreditCard from '../CreditCard';
 
 const DetailScreen = ({ route }) => {
     const navigation = useNavigation();
@@ -92,11 +92,15 @@ const DetailScreen = ({ route }) => {
         </KeyboardAwareScrollView>
     );
 
+    const renderCredit = () => (
+        <CreditCard />
+    )
+
     return (
         <SafeAreaView style={styles.container}>
             <SecondaryHeader onPressBack={() => navigation.goBack()} isBack screenName={name} />
             <View style={styles.contentWrapper}>
-                {name === 'My Profile' ? renderMyProfile() : <Text>Credit Points</Text>}
+                {name === 'My Profile' ? renderMyProfile() : renderCredit()}
             </View>
         </SafeAreaView>
     );
@@ -110,6 +114,7 @@ const styles = StyleSheet.create({
     },
     contentWrapper: {
         flex: 1,
+        paddingVertical: 20
     },
 });
 

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback } from 'react'
 import { SafeAreaView, StyleSheet, View } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { useFocusEffect, useNavigation } from '@react-navigation/native'
@@ -16,7 +16,7 @@ const ProfileScreen = () => {
     const dispatch = useDispatch();
     const navigation = useNavigation()
     const { user } = useUserData();
-    const { data } = useSelector(state => state.profile);
+    const { data } = useSelector(state => state.profile);    
 
     useFocusEffect(useCallback(() => {
         dispatch(userProfile());
@@ -65,10 +65,10 @@ const ProfileScreen = () => {
         <SafeAreaView style={styles.container}>
             <SecondaryHeader isBack screenName='Account' onPressBack={() => navigation.navigate('BottomTab', { screen: 'Home' })} />
             <View style={styles.bodyWrapper}>
-                <Avatar fullName={user?.name} />
+                <Avatar fullName={user?.name || ''} />
                 <View style={{ alignItems: 'center', gap: 5, marginBottom: 25 }}>
-                    <Typo style={{ fontFamily: 'Outfit-Bold' }} type='h5' title={user?.name} />
-                    <Typo style={{ fontFamily: 'Outfit-Medium', fontSize: 14, color: ColorPalatte.secondaryTxt }} type='h5' title={user?.email} />
+                    <Typo style={{ fontFamily: 'Outfit-Bold' }} type='h5' title={user?.name || ''} />
+                    <Typo style={{ fontFamily: 'Outfit-Medium', fontSize: 14, color: ColorPalatte.secondaryTxt }} type='h5' title={user?.email || ''} />
                     <ButtonComp
                         onPress={() =>
                             navigation.navigate('ProfileDetail', {

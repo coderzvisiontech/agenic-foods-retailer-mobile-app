@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { CheckIcon } from '../../Config/ImgConfig';
 import { ColorPalatte, FontSize } from '../../Themes';
@@ -10,7 +10,23 @@ const steps = [
     'Delivered',
 ];
 
-const StatusTracking = ({ currentStepName = '' }) => {
+const StatusTracking = ({ deliveryStatus }) => {    
+    const currentStepName = useMemo(() => {
+        const order_status = deliveryStatus?.order_status?.toLowerCase();
+        const outofDelivery = deliveryStatus?.outofDelivery;
+
+        switch (order_status) {
+            case 'new order':
+                return 'Order Received';
+            case 'inprogress':
+                return outofDelivery === 1 ? 'Order Packed' : 'On the way';
+            case 'completed':
+                return 'Delivered';
+            default:
+                return '';
+        }
+    }, [deliveryStatus]);
+
     const currentStepIndex = steps.indexOf(currentStepName);
 
     return (
@@ -23,9 +39,7 @@ const StatusTracking = ({ currentStepName = '' }) => {
                     <View key={index} style={styles.stepRow}>
                         <View style={styles.iconColumn}>
                             <View style={styles.circleWrapper}>
-                                {isCompleted ? (
-                                    <CheckIcon />
-                                ) : isActive ? (
+                                {isCompleted || isActive ? (
                                     <CheckIcon />
                                 ) : (
                                     <View style={styles.inactiveCircle} />
@@ -77,6 +91,13 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginRight: 12,
         width: CIRCLE_SIZE,
+    },
+    circleWrapper: {
+        width: CIRCLE_SIZE,
+        height: CIRCLE_SIZE,
+        borderRadius: CIRCLE_SIZE / 2,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     inactiveCircle: {
         width: CIRCLE_SIZE,
