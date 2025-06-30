@@ -11,6 +11,7 @@ export const userProfile = createAsyncThunk(
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `${token}`,
+                'Cache-Control': 'no-store'
             }
         }
 
@@ -18,7 +19,7 @@ export const userProfile = createAsyncThunk(
             const response = await axios.get(`${VITE_API_URL}/profile`, config);
             return response;
         } catch (error) {
-          
+
             if (error?.response && error?.response?.data) {
                 return rejectWithValue(error?.response?.data);
             } else {

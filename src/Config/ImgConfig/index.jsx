@@ -41,6 +41,7 @@ import ClearIcon from '../../Assets/Icons/clear_icon.svg'
 import OrderDelivered from "../../Assets/Icons/order_delivered.svg"
 import OrderOntheway from "../../Assets/Icons/order_ontheway.svg"
 import OrderPacked from "../../Assets/Icons/order_packed.svg"
+import MapMarker from "../../Assets/Icons/map_marker.svg"
 
 // Home Icon
 const HomeIcon = ({ color = ColorPalatte.grey_300, ...props }) => (
@@ -202,6 +203,7 @@ export {
     OrderDelivered,
     OrderOntheway,
     OrderPacked,
+    MapMarker,
     HomeIcon,
     CartIcon,
     NotificationIcon,

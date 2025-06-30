@@ -11,6 +11,7 @@ export const cartList = createAsyncThunk(
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `${token}`,
+                'Cache-Control': 'no-store'
             }
         }
 
@@ -38,6 +39,7 @@ export const cartDelete = createAsyncThunk(
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `${token}`,
+                'Cache-Control': 'no-store'
             }
         }
 
@@ -65,6 +67,7 @@ export const cartTimeslot = createAsyncThunk(
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `${token}`,
+                'Cache-Control': 'no-store'
             }
         }
 

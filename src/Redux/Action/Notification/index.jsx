@@ -11,6 +11,7 @@ export const notificationList = createAsyncThunk(
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `${token}`,
+                'Cache-Control': 'no-store'
             }
         }
 
@@ -37,11 +38,12 @@ export const notificationDetail = createAsyncThunk(
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `${token}`,
+                'Cache-Control': 'no-store'
             }
         }
 
         try {
-            const response = await axios.get(`${VITE_API_URL}/notification`, dataObject, config);
+            const response = await axios.put(`${VITE_API_URL}/notification`, dataObject, config);
             return response;
         } catch (error) {
             if (error?.response && error?.response?.data) {

@@ -21,7 +21,7 @@ import {
 import { ColorPalatte } from '../../../Themes';
 import { RegisterSchema } from '../../../Utils/ValidationSchema';
 import { useDispatch } from 'react-redux';
-import { authSignup } from '../../../Redux/Action/Auth';
+import { authLogin, authSignup } from '../../../Redux/Action/Auth';
 import { showToast } from '../../../Utils/Helper/toastHelper';
 
 const RegisterScreen = ({ route }) => {
@@ -78,20 +78,31 @@ const RegisterScreen = ({ route }) => {
                 console.log('res', res)
                 if (res?.payload?.data?.status) {
                     showToast('success', 'Registration Successfull');
-                    setRegisterData((prev) => ({
-                        ...prev,
-                        infoState: { loading: false }
-                    }))
-                    setTimeout(() => {
-                        navigation.navigate('SuccessScreen', {
-                            message: 'Successfully Created a Account',
-                            screenRoute: {
-                                routeName: 'BottomTab',
-                                params: { screen: 'loginScreen' }
-                            }
-                        });
+                    console.log('values', values)
+                    dispatch(authLogin({ phone: { code: "+91", number: values?.number } })).then((res) => {
+                        console.log('res', res);
+                        if (res?.payload?.status === 200) {
+                            setRegisterData((prev) => ({
+                                ...prev,
+                                infoState: { loading: false }
+                            }))
+                            showToast('success', 'OTP sent successfully.')
+                            setTimeout(() => {
+                                navigation.navigate('OtpScreen', { phone: values?.number, isFrom: 'Register' });
+                            }, 1000)
+                        }
+                    })
+                    // setTimeout(() => {
+                    //     // navigation.navigate('SuccessScreen', {
+                    //     //     message: 'Successfully Created a Account',
+                    //     //     screenRoute: {
+                    //     //         routeName: 'BottomTab',
+                    //     //         params: { screen: 'loginScreen' }
+                    //     //     }
+                    //     // });
+                    //     navigation.navigate('OtpScreen', { phone: values?.number });
 
-                    }, 1500)
+                    // }, 1500)
                 } else if (res?.payload?.data?.isExist) {
                     showToast('error', res?.payload?.data?.message);
                     setRegisterData((prev) => ({
@@ -177,8 +188,9 @@ const RegisterScreen = ({ route }) => {
                                 value={formik.values.address}
                                 error={formik.touched.address && formik.errors.address}
                                 isMandatory
+                                editable={false}
+                                onPressIn={() => navigation.navigate('GoogleMapScreen')}
                             />
-                            {console.log('formik.values.document', formik.values.document)}
                             <TextInput
                                 label="Upload a Document"
                                 placeholder="Choose a file"

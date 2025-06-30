@@ -11,6 +11,7 @@ export const productList = createAsyncThunk(
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `${token}`,
+                'Cache-Control': 'no-store'
             }
         }
 
@@ -18,7 +19,7 @@ export const productList = createAsyncThunk(
             const response = await axios.get(`${VITE_API_URL}/product`, config);
             return response;
         } catch (error) {
-          
+
             if (error?.response && error?.response?.data) {
                 return rejectWithValue(error?.response?.data);
             } else {
@@ -38,6 +39,7 @@ export const addCart = createAsyncThunk(
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `${token}`,
+                'Cache-Control': 'no-store'
             }
         }
 
@@ -45,7 +47,7 @@ export const addCart = createAsyncThunk(
             const response = await axios.post(`${VITE_API_URL}/cart`, dataObject, config);
             return response;
         } catch (error) {
-          
+
             if (error?.response && error?.response?.data) {
                 return rejectWithValue(error?.response?.data);
             } else {

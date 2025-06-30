@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import {
     SafeAreaView,
     StyleSheet,
@@ -18,18 +18,18 @@ import {
 } from '../../Components';
 import { ColorPalatte } from '../../Themes';
 import { addCart, productList } from '../../Redux/Action/Product';
-import useUserData from '../../Hooks/useFetchUser';
 import { showToast } from '../../Utils/Helper/toastHelper';
 import { getCartProducts, storeCartProducts } from '../../Hooks/useStoreBulkData';
+import { ListLoader } from '../../Loader';
 
 const ProductList = () => {
     const navigation = useNavigation();
     const dispatch = useDispatch();
-    const { products } = useSelector(state => state.product);
-    const { user } = useUserData();
+    const { products, productLoading } = useSelector(state => state.product);
 
     const [homeData, setHomeData] = useState({
         quantities: {},
+        cartCount: 0,
     })
 
     useFocusEffect(
@@ -37,6 +37,23 @@ const ProductList = () => {
             dispatch(productList());
         }, [])
     );
+
+    useEffect(() => {
+        const unsubscribe = navigation.addListener('focus', async () => {
+            try {
+                const existingCart = await getCartProducts();
+                setHomeData(prev => ({
+                    ...prev,
+                    cartCount: existingCart?.length,
+                }));
+            } catch (err) {
+                console.error('Error fetching cart data', err);
+            }
+        });
+
+        return unsubscribe;
+    }, []);
+
 
     const mappedProducts = useMemo(() => {
         return products?.response?.document?.map((item) => ({
@@ -88,7 +105,7 @@ const ProductList = () => {
     const handleCheckout = async () => {
         try {
             const existingCart = await getCartProducts();
-
+            setHomeData((prev) => ({ ...prev, cartCount: existingCart }))
             const cartMap = new Map();
 
             existingCart?.forEach(item => {
@@ -106,7 +123,6 @@ const ProductList = () => {
             });
 
             const updatedCart = Array?.from(cartMap?.values());
-
             await storeCartProducts(updatedCart);
 
             showToast('success', 'Cart added successfully!');
@@ -130,7 +146,7 @@ const ProductList = () => {
 
     const renderAddCart = useMemo(() => {
         return (
-            cartItems.length > 0 && (
+            cartItems?.length > 0 && (
                 <BottomCard
                     items={cartItems}
                     onPress={handleCheckout}
@@ -147,26 +163,32 @@ const ProductList = () => {
             <PrimaryHeader
                 isNotification
                 isCart
-                cartCount={counts?.cartCount}
+                cartCount={counts?.cartCount || homeData?.cartCount}
                 notifyCount={counts?.notificationCount}
                 onNotifyPress={() => navigation.navigate("BottomTab", { screen: 'Notification' })}
                 onCartPress={() => navigation.navigate("BottomTab", { screen: 'Cart' })}
             />
-            <View style={{ paddingVertical: 20 }}>
+            <View style={{ paddingVertical: 20, flex: productLoading && 1 }}>
                 <TextInput
                     type="search"
                     placeholder="Search"
                 />
-                <FlatList
-                    data={mappedProducts}
-                    keyExtractor={(item) => item?.id}
-                    renderItem={renderItem}
-                    showsVerticalScrollIndicator={false}
-                    contentContainerStyle={{
-                        paddingBottom: cartItems?.length > 0 ? 150 : 60
-                    }}
-                />
-                {renderAddCart}
+
+                {productLoading ? (
+                    <ListLoader />
+                ) : (
+                    <FlatList
+                        data={mappedProducts}
+                        keyExtractor={(item) => item?.id}
+                        renderItem={renderItem}
+                        showsVerticalScrollIndicator={false}
+                        contentContainerStyle={{
+                            paddingBottom: cartItems?.length > 0 ? 150 : 60
+                        }}
+                    />
+                )}
+
+                {!productLoading && renderAddCart}
             </View>
         </SafeAreaView>
     );

@@ -11,6 +11,7 @@ export const paymentOptions = createAsyncThunk(
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `${token}`,
+                'Cache-Control': 'no-store'
             }
         }
 
@@ -38,6 +39,7 @@ export const proceedPayment = createAsyncThunk(
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `${token}`,
+                'Cache-Control': 'no-store'
             }
         }
 

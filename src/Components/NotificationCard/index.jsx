@@ -5,7 +5,7 @@ import { ColorPalatte, FontSize } from '../../Themes';
 import { NotifyTag, DownIcon, UpIcon, DeleteIcon, OrderPacked, OrderDelivered, OrderOntheway } from '../../Config/ImgConfig';
 import { Typo } from "../../Components";
 
-const NotificationCard = ({ notifyData, onDeleteNotify, onToggleExpand, details, expand }) => {
+const NotificationCard = ({ notifyData, onDeleteNotify, onToggleExpand, details, status }) => {
   console.log('notifyData', notifyData);
 
   const renderRightActions = () => (
@@ -28,14 +28,15 @@ const NotificationCard = ({ notifyData, onDeleteNotify, onToggleExpand, details,
               <Typo style={styles.subHead} title={notifyData?.time} />
             </View>
             <View>
-              {expand ? <UpIcon /> : <DownIcon />}
+              {status && details ? <UpIcon /> : <DownIcon />}
             </View>
           </View>
 
-          {expand && (
+          {status && details && (
             <View style={styles.expandedBox}>
-              <Typo style={styles.expandedText} title={`Title : Egyptian Citrus 88C Delivered`} />
-              <Typo style={styles.expandedText} title={`Time : Wed at 01:01 PM`} />
+              <Typo style={styles.expandedText} title={`Status : ${notifyData?.title}`} />
+              <Typo style={styles.expandedText} title={`Title : ${notifyData?.message}`} />
+              <Typo style={styles.expandedText} title={`Time : ${notifyData?.time}`} />
             </View>
           )}
         </View>

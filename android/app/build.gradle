@@ -114,6 +114,11 @@ dependencies {
     implementation("com.facebook.react:react-android")
     implementation 'androidx.multidex:multidex:2.0.1'
 
+    implementation 'com.google.android.gms:play-services-location:21.0.1'
+    implementation 'com.google.android.gms:play-services-base:18.2.0'
+    implementation 'com.google.android.gms:play-services-basement:18.2.0'
+    implementation 'com.google.android.gms:play-services-tasks:18.0.2'
+
     // Flipper
     debugImplementation("com.facebook.flipper:flipper:0.212.0")
     debugImplementation("com.facebook.flipper:flipper-network-plugin:0.212.0") {

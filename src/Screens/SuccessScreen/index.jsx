@@ -6,7 +6,7 @@ import { Typo } from '../../Components'
 import { ColorPalatte } from '../../Themes'
 
 const SuccessScreen = ({ route }) => {
-    const { message, screenRoute, screen } = route.params
+    const { message, screenRoute, screen, is_from } = route.params
     const fadeAnim = useRef(new Animated.Value(0)).current;
     const navigation = useNavigation();
 
@@ -17,9 +17,11 @@ const SuccessScreen = ({ route }) => {
             useNativeDriver: true,
         }).start(() => {
             setTimeout(() => {
-                if (screenRoute && screenRoute?.routeName) {
+                if (is_from === 'checkout') {
+                    navigation.navigate('OrderDeatils', { is_from: is_from })
+                } else if (screenRoute && screenRoute?.routeName) {
                     navigation.navigate(screenRoute?.routeName, screenRoute?.params || {});
-                } else if (screen) {
+                } else {
                     navigation.navigate(screen);
                 }
             }, 1000);

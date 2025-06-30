@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { SafeAreaView, StyleSheet, View, ScrollView } from 'react-native'
+import { SafeAreaView, StyleSheet, View, ScrollView, Text } from 'react-native'
 import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import { useDispatch } from 'react-redux'
 
@@ -7,6 +7,7 @@ import { ColorPalatte, FontSize } from '../../../../Themes'
 import { ButtonComp, OrderCard, SecondaryHeader, StatusTracking, Typo } from '../../../../Components'
 import { orderDetails } from '../../../../Redux/Action/Order'
 import PriceDetails from '../PriceDetails'
+import { OrderDetailLoader } from '../../../../Loader'
 
 const OrderDetailScreen = ({ route }) => {
     const { id, deliveryStatus } = route.params
@@ -49,7 +50,9 @@ const OrderDetailScreen = ({ route }) => {
     return (
         <SafeAreaView style={styles.container}>
             <SecondaryHeader isBack screenName={'Orders'} onPressBack={() => navigation.goBack()} />
-            {!orderData.loading && (
+            {orderData.loading ? (
+                <OrderDetailLoader />
+            ) : (
                 <ScrollView
                     contentContainerStyle={{ paddingVertical: 20, gap: 10, paddingBottom: 60 }}
                     showsVerticalScrollIndicator={false}

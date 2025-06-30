@@ -14,7 +14,7 @@ import { showToast } from '../../Utils/Helper/toastHelper'
 const PaymentScreen = ({ route }) => {
     const navigation = useNavigation();
     const dispatch = useDispatch();
-    const { data } = route.params
+    const { data, is_from } = route.params;
 
     const [paymentData, setPaymentData] = useState({
         paymentMethod: [],
@@ -68,7 +68,7 @@ const PaymentScreen = ({ route }) => {
             if (res?.payload.status === 200) {
                 navigation.navigate('SuccessScreen', {
                     message: 'Successfully Order Placed',
-                    screen: 'OrderDeatils'
+                    is_from: is_from
                 })
             }
         })

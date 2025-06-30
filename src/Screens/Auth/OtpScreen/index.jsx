@@ -32,7 +32,7 @@ const { height, width } = Dimensions.get('window');
 const OtpScreen = ({ route }) => {
     const navigation = useNavigation();
     const dispatch = useDispatch();
-    const { phone } = route.params;
+    const { phone, isFrom } = route.params;
 
     const [otpData, setOtpData] = useState({
         infoData: {
@@ -68,25 +68,39 @@ const OtpScreen = ({ route }) => {
                     }))
                     await AsyncStorage.setItem('token', res?.payload?.data?.token);
                     dispatch(userProfile()).then(async (res) => {
+                        console.log('res', res);
+
                         if (res?.payload?.status === 200) {
-                            await AsyncStorage.setItem('email', res?.payload?.data?.response?.[0]?.email)
-                            await AsyncStorage.setItem('full_name', `${res?.payload?.data?.response?.[0]?.first_name} ${res?.payload?.data?.response?.[0]?.last_name}`)
-                            await AsyncStorage.setItem('user_id', res?.payload?.data?.response?.[0]?._id)
-                            await AsyncStorage.setItem('phone_number', res?.payload?.data?.response?.[0]?.phone?.number)
-                            await AsyncStorage.setItem('available_address', res?.payload?.data?.response?.[0]?.availability_address)
+                            await AsyncStorage.setItem('email', res?.payload?.data?.response?.[0]?.email || '')
+                            await AsyncStorage.setItem('full_name', `${res?.payload?.data?.response?.[0]?.first_name || ''} ${res?.payload?.data?.response?.[0]?.last_name || ''}`)
+                            await AsyncStorage.setItem('user_id', res?.payload?.data?.response?.[0]?._id || '')
+                            await AsyncStorage.setItem('phone_number', res?.payload?.data?.response?.[0]?.phone?.number || '')
+                            await AsyncStorage.setItem('available_address', res?.payload?.data?.response?.[0]?.availability_address || '')
                             await AsyncStorage.setItem(
                                 'location',
-                                JSON.stringify(res?.payload?.data?.response?.[0]?.location)
+                                JSON.stringify(res?.payload?.data?.response?.[0]?.location || {})
                             );
 
                             await AsyncStorage.setItem(
                                 'address',
-                                JSON.stringify(res?.payload?.data?.response?.[0]?.address)
+                                JSON.stringify(res?.payload?.data?.response?.[0]?.address || {})
                             );
 
-                            setTimeout(() => {
-                                navigation.navigate('BottomTab', { screen: 'Home' })
-                            }, 1500)
+                            if (isFrom === 'Register') {
+                                setTimeout(() => {
+                                    navigation.navigate('SuccessScreen', {
+                                        screenRoute: {
+                                            routeName: 'BottomTab',
+                                            params: { screen: 'Home', message: 'Successfully Created a Account' }
+                                        }
+                                    });
+                                }, 1500)
+                            } else {
+                                setTimeout(() => {
+                                    navigation.navigate('BottomTab', { screen: 'Home' })
+                                }, 1500)
+                            }
+
                         } else {
                             showToast('error', 'Something went wrong')
                         }
@@ -125,7 +139,7 @@ const OtpScreen = ({ route }) => {
                         <Typo type='h2' title='Verify Mobile Number' />
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
                             <Typo type='p' title={`Enter OTP Sent to ${phone}`} />
-                            <TouchableOpacity onPress={() => navigation.navigate("LoginScreen")}>
+                            <TouchableOpacity onPress={() => navigation.goBack()}>
                                 <EditIcon />
                             </TouchableOpacity>
                         </View>

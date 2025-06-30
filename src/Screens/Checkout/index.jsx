@@ -86,13 +86,14 @@ const CheckoutScreen = () => {
                             deliveryTotal: cart?.total,
                             timeSlot: `${checkoutData?.selectedSlot?.starttime} - ${checkoutData?.selectedSlot?.endtime}`,
                             orderId: res?.payload?.data?.response
-                        }
+                        },
+                        is_from: 'checkout'
                     })
                 }, 1000)
             } else if (res?.payload?.status) {
                 showToast('error', res?.payload?.message)
             } else {
-                showToast('error', 'Something went wrong')
+                showToast('error', res?.payload?.message)
             }
         })
     }

@@ -34,6 +34,7 @@ const TextInputComp = ({
     label,
     isMandatory,
     selectionLimit = 1,
+    onPressIn,
     ...rest
 }) => {
     const [secure, setSecure] = useState(type === 'password');
@@ -160,17 +161,31 @@ const TextInputComp = ({
 
                         </>
                     ) : (
-                        <TextInput
-                            style={[styles.input, inputStyle]}
-                            placeholder={placeholder}
-                            placeholderTextColor={ColorPalatte.placeHolderClr}
-                            value={value}
-                            onChangeText={onChangeText}
-                            secureTextEntry={secure}
-                            keyboardType={getKeyboardType()}
-                            editable={editable}
-                            {...rest}
-                        />
+                        <>
+                            {editable ? (
+                                <TextInput
+                                    style={[styles.input, inputStyle]}
+                                    placeholder={placeholder}
+                                    placeholderTextColor={ColorPalatte.placeHolderClr}
+                                    value={value}
+                                    onChangeText={onChangeText}
+                                    secureTextEntry={secure}
+                                    keyboardType={getKeyboardType()}
+                                    editable={editable}
+                                    {...rest}
+                                />
+                            ) : (
+                                <TouchableOpacity
+                                    style={[styles.input, inputStyle, { justifyContent: 'center' }]}
+                                    onPress={onPressIn}
+                                    activeOpacity={0.8}
+                                >
+                                    <Text style={{ color: value ? ColorPalatte.blackClr : ColorPalatte.placeHolderClr }}>
+                                        {value || placeholder}
+                                    </Text>
+                                </TouchableOpacity>
+                            )}
+                        </>
                     )}
 
                     {renderRightIcon()}

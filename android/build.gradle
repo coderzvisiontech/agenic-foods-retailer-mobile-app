@@ -24,6 +24,14 @@ allprojects {
         mavenCentral()
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
     }
+    configurations.all {
+    resolutionStrategy {
+        force 'com.google.android.gms:play-services-location:21.0.1'
+        force 'com.google.android.gms:play-services-base:18.2.0'
+        force 'com.google.android.gms:play-services-basement:18.2.0'
+        force 'com.google.android.gms:play-services-tasks:18.0.2'
+    }
+  }
 }
 
 apply plugin: "com.facebook.react.rootproject"

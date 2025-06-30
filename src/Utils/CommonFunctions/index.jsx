@@ -1,6 +1,8 @@
 import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
-import { Platform, Alert } from 'react-native';
+import { Platform, Alert, PermissionsAndroid } from 'react-native';
+import Geolocation from 'react-native-geolocation-service';
 import moment from 'moment';
+import { showToast } from '../Helper/toastHelper';
 
 export const requestGalleryPermission = async () => {
     const permission =
@@ -14,7 +16,7 @@ export const requestGalleryPermission = async () => {
     const req = await request(permission);
     if (req === RESULTS.GRANTED) return true;
 
-    Alert.alert('Permission Required', 'Please allow photo access from settings.');
+    showToast('error', "Permission Required - Please allow photo access from settings.")
     return false;
 };
 
@@ -36,7 +38,7 @@ export const getDateData = () => {
     }
 
     return data;
-}
+};
 
 export const getISTFullDate = (selectedDate) => {
     const now = new Date(); // current time
@@ -49,4 +51,38 @@ export const getISTFullDate = (selectedDate) => {
 
     // This now has the selected date + current time
     return date.toString(); // Will output like "Thu Jun 26 2025 17:05:00 GMT+0530 (India Standard Time)"
+};
+
+export const requestLocationPermission = async () => {
+    try {
+        if (Platform.OS === 'android') {
+            const granted = await PermissionsAndroid.request(
+                PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+            );
+            if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+                showToast('error', "Permission denied - Cannot access location.")
+                return;
+            }
+        }
+
+        Geolocation.getCurrentPosition(
+            position => {
+                const { latitude, longitude } = position.coords;
+                const regionData = {
+                    latitude,
+                    longitude,
+                    latitudeDelta: 0.01,
+                    longitudeDelta: 0.01,
+                };
+                setRegion(regionData);
+                setMarker({ latitude, longitude });
+            },
+            error => {
+                console.error('Geolocation error:', error);
+            },
+            { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 },
+        );
+    } catch (err) {
+        console.warn(err);
+    }
 };

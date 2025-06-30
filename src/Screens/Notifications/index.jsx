@@ -7,25 +7,17 @@ import { SecondaryHeader, Typo, ButtonComp, NotificationCard } from '../../Compo
 import { ColorPalatte, FontSize } from '../../Themes'
 import { NoNotification } from '../../Config/ImgConfig'
 import { notificationDetail, notificationList } from '../../Redux/Action/Notification'
+import { ListLoader } from '../../Loader'
 
 const NotificationScreen = () => {
     const navigation = useNavigation();
     const dispatch = useDispatch();
-    const { notification } = useSelector(state => state.notification);
+    const { notification, notificationLoading } = useSelector(state => state.notification);
 
     const [notifyData, setNotifyData] = useState({
-        notifyDetails: {},
+        status: {},
         expandId: ''
     })
-
-    const data = [
-        {
-            id: 1,
-            title: 'Product Price Changed',
-            body: 'Egyptian Citrus 72C Price Changed to ₹1100',
-            time: '3h ago'
-        }
-    ]
 
     useFocusEffect(useCallback(() => {
         dispatch(notificationList())
@@ -46,16 +38,25 @@ const NotificationScreen = () => {
     }, []);
 
     const handleToggle = useCallback((item) => {
-        console.log('item', item);
-
-        const payload = {
-            id: item?.id,
-            status: item?.status
+        if (notifyData?.expandId === item?.id) {
+            setNotifyData((prev) => ({
+                ...prev,
+                expandId: null,
+                status: false,
+            }));
+            return;
         }
-        dispatch(notificationDetail(payload)).then((res) => {
-            console.log('res', res)
+
+        dispatch(notificationDetail({ notificationId: item?.id })).then((res) => {
+            if (res?.payload?.status === 200) {
+                setNotifyData((prev) => ({
+                    ...prev,
+                    status: res?.payload.data.status,
+                    expandId: item?.id
+                }))
+            }
         })
-    }, [])
+    }, [notifyData?.expandId])
 
     const renderItem = (item) => {
         return (
@@ -65,42 +66,59 @@ const NotificationScreen = () => {
                     handleDelete(item?.item?.id)
                 }}
                 onToggleExpand={() => handleToggle(item?.item)}
-                expand={notifyData?.expandId}
+                status={notifyData?.status}
+                details={notifyData?.expandId === item?.item?.id}
             />
         )
     }
 
+    const handleClear = useCallback(() => {
+        console.log('clicked...')
+    }, []);
+
     return (
         <SafeAreaView style={styles.container}>
-            <SecondaryHeader isClear isBack screenName={'Notifications'} onPressBack={() => navigation.goBack()} />
+            <SecondaryHeader
+                isClear
+                isBack
+                screenName={'Notifications'}
+                onPressBack={() => navigation.goBack()}
+                onClear={handleClear}
+            />
 
-            {mappedNotification?.length > 0 ? (
-                <FlatList
-                    data={mappedNotification}
-                    keyExtractor={(item) => item?.id}
-                    renderItem={renderItem}
-                    showsVerticalScrollIndicator={false}
-                />
+            {notificationLoading ? (
+                <ListLoader height={75} />
             ) : (
-                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', gap: 20 }}>
-                    <NoNotification />
-                    <View style={{ alignItems: 'center', gap: 5 }}>
-                        <Typo
-                            style={{ fontSize: FontSize.fontSize16, fontFamily: 'Outfit-Medium' }}
-                            title={'You Have No Notification'}
-                        />
-                        <Typo
-                            style={{ fontSize: FontSize.fontSize14, fontFamily: 'Outfit-Medium', color: ColorPalatte.grey_400 }}
-                            title={'Nothing new here, check back later'}
+                mappedNotification?.length > 0 ? (
+                    <FlatList
+                        data={mappedNotification}
+                        keyExtractor={(item) => item?.id}
+                        renderItem={renderItem}
+                        showsVerticalScrollIndicator={false}
+                    />
+                ) : (
+                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', gap: 20 }}>
+                        <NoNotification />
+                        <View style={{ alignItems: 'center', gap: 5 }}>
+                            <Typo
+                                style={{ fontSize: FontSize.fontSize16, fontFamily: 'Outfit-Medium' }}
+                                title={'You Have No Notification'}
+                            />
+                            <Typo
+                                style={{ fontSize: FontSize.fontSize14, fontFamily: 'Outfit-Medium', color: ColorPalatte.grey_400 }}
+                                title={'Nothing new here, check back later'}
+                            />
+                        </View>
+                        <ButtonComp
+                            type='mediumPrimary'
+                            title='Back to Home'
+                            onPress={() => navigation.navigate('BottomTab', { screen: 'Home' })}
                         />
                     </View>
-                    <ButtonComp
-                        type='mediumPrimary'
-                        title='Back to Home'
-                        onPress={() => navigation.navigate('BottomTab', { screen: 'Home' })}
-                    />
-                </View>
+                )
             )}
+
+
 
         </SafeAreaView>
     )
