@@ -1,8 +1,9 @@
 import React, { useCallback } from 'react'
-import { SafeAreaView, StyleSheet, View } from 'react-native'
+import { SafeAreaView, StyleSheet, View, Linking, Alert } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { useFocusEffect, useNavigation } from '@react-navigation/native'
 
+import { VITE_SUPPORT_GMAIL } from "@env"
 import { ColorPalatte } from '../../Themes'
 import { Avatar, ButtonComp, SecondaryHeader, Typo } from '../../Components'
 import useUserData from '../../Hooks/useFetchUser'
@@ -11,12 +12,13 @@ import { PROFILE_MENU } from '../../Interface'
 import { authLogout } from '../../Redux/Action/Auth'
 import { userProfile } from '../../Redux/Action/Profile'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { showToast } from '../../Utils/Helper/toastHelper'
 
 const ProfileScreen = () => {
     const dispatch = useDispatch();
     const navigation = useNavigation()
     const { user } = useUserData();
-    const { data } = useSelector(state => state.profile);    
+    const { data } = useSelector(state => state.profile);
 
     useFocusEffect(useCallback(() => {
         dispatch(userProfile());
@@ -44,12 +46,15 @@ const ProfileScreen = () => {
                 });
                 break;
             case 'support':
-                console.log('Contact Support');
+                const email = VITE_SUPPORT_GMAIL;
+                const subject = 'Need Help';
+                const body = 'Greeting Support Team,';
+                const url = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                Linking.openURL(url).catch((err) => {
+                    showToast('error', 'Could not open email client')
+                });
                 break;
             case 'logout':
-                // dispatch(authLogout()).then((res)=>{
-                //     console.log('res',res)
-                // })
                 AsyncStorage.removeItem('token').then(() => {
                     navigation.navigate('LoginScreen');
                 }).catch((error) => {

@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useFormik } from 'formik';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
     BackgroundWrapper,
     ButtonComp,
@@ -78,6 +79,7 @@ const LoginScreen = () => {
                         ...prev,
                         infoState: { loading: false }
                     }))
+                    AsyncStorage.setItem('credit_points', res?.payload?.data?.general?.credits)
                     showToast('success', 'OTP Sent Successfully');
                     setTimeout(() => {
                         navigation.navigate("OtpScreen", { phone: values?.phone })

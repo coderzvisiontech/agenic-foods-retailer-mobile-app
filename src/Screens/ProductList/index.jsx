@@ -4,23 +4,26 @@ import {
     StyleSheet,
     FlatList,
     View,
+    Dimensions,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {
     PrimaryHeader,
     StatusBarComp,
     ProductCard,
     TextInput,
-    BottomCard
+    BottomCard,
+    Typo
 } from '../../Components';
 import { ColorPalatte } from '../../Themes';
-import { addCart, productList } from '../../Redux/Action/Product';
+import { productList } from '../../Redux/Action/Product';
 import { showToast } from '../../Utils/Helper/toastHelper';
 import { getCartProducts, storeCartProducts } from '../../Hooks/useStoreBulkData';
 import { ListLoader } from '../../Loader';
+
+const { height } = Dimensions.get('window')
 
 const ProductList = () => {
     const navigation = useNavigation();
@@ -30,6 +33,7 @@ const ProductList = () => {
     const [homeData, setHomeData] = useState({
         quantities: {},
         cartCount: 0,
+        searchData: ''
     })
 
     useFocusEffect(
@@ -54,14 +58,24 @@ const ProductList = () => {
         return unsubscribe;
     }, []);
 
-
     const mappedProducts = useMemo(() => {
-        return products?.response?.document?.map((item) => ({
+        const allProducts = products?.response?.document || [];
+        const searchLower = homeData?.searchData?.toLowerCase()?.trim();
+
+        const filtered = allProducts.filter((item) => {
+            if (!searchLower) return true;
+            return (
+                item?.name?.toLowerCase()?.includes(searchLower)
+            );
+        });
+
+        return filtered.map((item) => ({
             ...item,
             quantity: homeData?.quantities?.[item?.id],
-            items_left: item?.quantity
-        })) || [];
-    }, [products, homeData?.quantities]);
+            items_left: item?.quantity,
+        }));
+    }, [products, homeData?.quantities, homeData?.searchData]);
+
 
     const counts = useMemo(() => ({
         cartCount: products?.cartCount,
@@ -79,28 +93,6 @@ const ProductList = () => {
         mappedProducts?.filter(item => item?.quantity > 0),
         [mappedProducts]
     );
-
-    // const handleCheckout = () => {
-    //     console.log('cartItems--->', cartItems)
-    //     storeCartProducts(cartItems)
-    //     showToast('success', 'Cart added successfully!');
-    //     setHomeData((prev) => ({
-    //         ...prev,
-    //         quantities: {}
-    //     }))
-    //     // const cartPayload = cartItems?.map(item => ({
-    //     //     product_id: item?.id,
-    //     //     quantity: item?.quantity,
-    //     //     price: (item?.price * item?.quantity),
-    //     // }));
-    //     // dispatch(addCart({ cart_add: cartPayload })).then((res) => {
-    //     //     console.log('Add to Cart', res)
-    //     //     if (res?.payload?.data?.rt_approved_status === 1 && res?.payload?.data?.status === 1) {
-    //     //         showToast('success', 'Cart added successfully!');
-    //     //         setQuantities({});
-    //     //     }
-    //     // })
-    // };
 
     const handleCheckout = async () => {
         try {
@@ -156,7 +148,6 @@ const ProductList = () => {
         );
     }, [cartItems, handleCheckout]);
 
-
     return (
         <SafeAreaView style={styles.container}>
             <StatusBarComp backgroundColor={ColorPalatte.whiteClr} visible={true} />
@@ -168,11 +159,25 @@ const ProductList = () => {
                 onNotifyPress={() => navigation.navigate("BottomTab", { screen: 'Notification' })}
                 onCartPress={() => navigation.navigate("BottomTab", { screen: 'Cart' })}
             />
-            <View style={{ paddingVertical: 20, flex: productLoading && 1 }}>
+            <View style={{ paddingVertical: 20, flex: (productLoading || !productLoading && mappedProducts?.length === 0) && 1 }}>
                 <TextInput
                     type="search"
                     placeholder="Search"
+                    value={homeData?.searchData}
+                    onChangeText={(text) =>
+                        setHomeData((prev) => ({
+                            ...prev,
+                            searchData: text,
+                        }))
+                    }
                 />
+
+                {!productLoading && mappedProducts?.length === 0 && (
+                    <Typo
+                        style={{ textAlign: 'center', justifyContent: 'center', alignItems: 'center', top: height * 0.35 }}
+                        title="No products match your search."
+                    />
+                )}
 
                 {productLoading ? (
                     <ListLoader />
