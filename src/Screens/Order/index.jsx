@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { FlatList, SafeAreaView, StyleSheet, View } from 'react-native';
+import { FlatList, SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 
 import { ButtonComp, OrderCard, SecondaryHeader, TextInput, Typo } from '../../Components';
@@ -128,7 +128,9 @@ const OrderDeatils = ({ route }) => {
                 />
 
                 {orderLoading && pageData?.isInitialLoad ? (
-                    <ListLoader />
+                    <ScrollView showsVerticalScrollIndicator={false}>
+                        <ListLoader />
+                    </ScrollView>
                 ) : orderData?.length > 0 ? (
                     <FlatList
                         data={orderData}

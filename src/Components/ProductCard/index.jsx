@@ -135,9 +135,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Image, StyleSheet, TouchableOpacity, Text } from 'react-native';
 import { VITE_UPLOAD_IMG } from "@env"
-import { Typo } from "../../Components"
+import { TextInput, Typo } from "../../Components"
 import { ColorPalatte } from '../../Themes';
 import { DecrementIcon, DeleteIcon, DisableDecrementIcon, DisableIncrementIcon, IncrementIcon } from '../../Config/ImgConfig';
+import { showToast } from '../../Utils/Helper/toastHelper';
 
 const ProductCard = ({ data, onQuantityChange, isDelete, onDelete, tailWidth, ellipsis = false }) => {
     const {
@@ -152,10 +153,16 @@ const ProductCard = ({ data, onQuantityChange, isDelete, onDelete, tailWidth, el
 
     const [qty, setQty] = useState(quantity);
     const debounceTimer = useRef(null);
+    const [isEditingQty, setIsEditingQty] = useState(false);
+    const inputRef = useRef(null);
     const isSoldOut = items_left === 0;
 
     const increaseQty = () => {
-        setQty(prev => prev + 1);
+        if (qty < items_left) {
+            setQty(prev => prev + 1);
+        } else {
+            showToast('error', `Only ${items_left} item${items_left > 1 ? 's' : ''} available`);
+        }
     };
 
     const decreaseQty = () => {
@@ -251,7 +258,46 @@ const ProductCard = ({ data, onQuantityChange, isDelete, onDelete, tailWidth, el
                         <TouchableOpacity disabled={isSoldOut} onPress={decreaseQty}>
                             {isSoldOut ? <DisableDecrementIcon /> : <DecrementIcon />}
                         </TouchableOpacity>
-                        <Typo style={isSoldOut ? { fontFamily: 'Outfit-Bold', color: ColorPalatte.disableTxt } : { fontFamily: 'Outfit-Bold', color: ColorPalatte.primartTxt }} type='h5' title={qty} />
+                        {isEditingQty ? (
+                            <TextInput
+                                ref={inputRef}
+                                style={styles.qtyWrapper}
+                                inputStyle={{ padding: 0, marginLeft: 6, fontSize: 18, height: 27 }}
+                                value={qty}
+                                paddingHori={false}
+                                onChangeText={(text) => {
+                                    const parsed = parseInt(text, 10);
+                                    if (!isNaN(parsed)) {
+                                        if (parsed > items_left) {
+                                            showToast('error', `Only ${items_left} item${items_left > 1 ? 's' : ''} available`);
+                                            setQty(items_left);
+                                        } else {
+                                            setQty(parsed);
+                                        }
+                                    } else {
+                                        setQty(0);
+                                    }
+                                }}
+
+                                onBlur={() => setIsEditingQty(false)}
+                                keyboardType="number-pad"
+                                maxLength={3}
+                                autoFocus
+                            />
+                        ) : (
+                            <TouchableOpacity onPress={() => !isSoldOut && setIsEditingQty(true)}>
+                                <Typo
+                                    style={
+                                        isSoldOut
+                                            ? { fontFamily: 'Outfit-Bold', color: ColorPalatte.disableTxt }
+                                            : styles.qty
+                                    }
+                                    type="h5"
+                                    title={qty}
+                                />
+                            </TouchableOpacity>
+                        )}
+
                         <TouchableOpacity disabled={isSoldOut} onPress={increaseQty}>
                             {isSoldOut ? <DisableIncrementIcon /> : <IncrementIcon />}
                         </TouchableOpacity>
@@ -293,4 +339,23 @@ const styles = StyleSheet.create({
         paddingVertical: 4,
         borderRadius: 4,
     },
+    qty: {
+        fontFamily: 'Outfit-Bold',
+        color: ColorPalatte.primartTxt,
+        borderWidth: 1,
+        borderColor: ColorPalatte.grey_200,
+        borderRadius: 4,
+        // width: 26,
+        // height: 27,
+        textAlign: 'center',
+        padding:4
+    },
+    qtyWrapper: {
+        maxWidth: 26,
+        textAlign: 'center',
+        borderWidth: 0,
+        height: 27,
+        justifyContent: 'center',
+        marginBottom: 0
+    }
 });

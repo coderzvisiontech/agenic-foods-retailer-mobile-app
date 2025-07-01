@@ -35,6 +35,7 @@ const TextInputComp = ({
     isMandatory,
     selectionLimit = 1,
     onPressIn,
+    paddingHori = true,
     ...rest
 }) => {
     const [secure, setSecure] = useState(type === 'password');
@@ -124,7 +125,7 @@ const TextInputComp = ({
                         )}
                     </View>
                 )}
-                <View style={styles.inputWrapper}>
+                <View style={[styles.inputWrapper, { paddingHorizontal: paddingHori && 12, }]}>
                     {renderLeftIcon()}
 
                     {type === 'upload' ? (
@@ -227,7 +228,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderRadius: 8,
         backgroundColor: ColorPalatte.whiteClr,
-        paddingHorizontal: 12,
+        // paddingHorizontal: 12,
         borderWidth: 1,
         borderColor: ColorPalatte.grey_200,
     },

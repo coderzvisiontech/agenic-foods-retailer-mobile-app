@@ -6,8 +6,6 @@ import { NotifyTag, DownIcon, UpIcon, DeleteIcon, OrderPacked, OrderDelivered, O
 import { Typo } from "../../Components";
 
 const NotificationCard = ({ notifyData, onDeleteNotify, onToggleExpand, details, status }) => {
-  console.log('notifyData', notifyData);
-
   const renderRightActions = () => (
     <TouchableOpacity style={styles.deleteContainer} onPress={onDeleteNotify}>
       <DeleteIcon color={ColorPalatte.whiteClr} />

@@ -5,7 +5,7 @@ import { VITE_UPLOAD_IMG } from "@env"
 import { ColorPalatte, FontSize } from '../../Themes'
 import { Typo } from "../../Components"
 import { BlackRIght } from '../../Config/ImgConfig'
-import { formatList } from '../../Utils/CommonFunctions'
+import { formatList } from '../../Utils/Helper/formatHelper'
 import { ColorCard } from './style'
 
 const OrderCard = ({ data, onOrderPress, isOrder = true }) => {

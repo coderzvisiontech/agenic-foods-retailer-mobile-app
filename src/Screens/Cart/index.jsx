@@ -346,6 +346,7 @@ const CartScreen = () => {
                         btnTitle='Checkout'
                         isRight={true}
                         bottom={0}
+                        isAlign
                     />
                 )}
             </View>

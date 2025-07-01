@@ -5,7 +5,7 @@ import { VITE_API_URL } from "@env"
 
 export const productList = createAsyncThunk(
     "getfresh/product/list",
-    async (_, { rejectWithValue }) => {
+    async (dataObject, { rejectWithValue }) => {
         const token = await AsyncStorage.getItem('token');
         const config = {
             headers: {
@@ -15,8 +15,8 @@ export const productList = createAsyncThunk(
             }
         }
 
-        try {
-            const response = await axios.get(`${VITE_API_URL}/product`, config);
+        try {            
+            const response = await axios.get(`${VITE_API_URL}/product?start=${dataObject?.start}&limit=${dataObject?.limit}`, config);
             return response;
         } catch (error) {
 

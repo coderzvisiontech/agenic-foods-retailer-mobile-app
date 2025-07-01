@@ -19,7 +19,7 @@ import {
     TextInput,
 } from '../../../Components';
 import { ColorPalatte } from '../../../Themes';
-import { RegisterSchema } from '../../../Utils/ValidationSchema';
+import { RegisterSchema } from '../../../Utils/Helper/ValidationSchema';
 import { useDispatch } from 'react-redux';
 import { authLogin, authSignup } from '../../../Redux/Action/Auth';
 import { showToast } from '../../../Utils/Helper/toastHelper';

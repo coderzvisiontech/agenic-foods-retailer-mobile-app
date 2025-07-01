@@ -1,13 +1,16 @@
 import React, { useCallback, useMemo, useState } from 'react'
-import { SafeAreaView, StyleSheet, View, FlatList } from 'react-native'
+import { SafeAreaView, StyleSheet, View, FlatList, Dimensions } from 'react-native'
 import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { SecondaryHeader, Typo, ButtonComp, NotificationCard } from '../../Components'
+import { SecondaryHeader, Typo, ButtonComp, NotificationCard, BottomSheet } from '../../Components'
 import { ColorPalatte, FontSize } from '../../Themes'
 import { NoNotification } from '../../Config/ImgConfig'
-import { notificationDetail, notificationList } from '../../Redux/Action/Notification'
+import { notificationDetail, notificationList, notifyDelAll, notifySingleDel } from '../../Redux/Action/Notification'
 import { ListLoader } from '../../Loader'
+import { showToast } from '../../Utils/Helper/toastHelper'
+
+const { height } = Dimensions.get('window')
 
 const NotificationScreen = () => {
     const navigation = useNavigation();
@@ -16,7 +19,8 @@ const NotificationScreen = () => {
 
     const [notifyData, setNotifyData] = useState({
         status: {},
-        expandId: ''
+        expandId: '',
+        openDelSheet: false
     })
 
     useFocusEffect(useCallback(() => {
@@ -34,7 +38,12 @@ const NotificationScreen = () => {
     }, [notification]);
 
     const handleDelete = useCallback((id) => {
-        console.log('Id------', id)
+        dispatch(notifySingleDel({ notificationId: id })).then((res) => {
+            if (res?.payload?.status === 200) {
+                showToast('success', 'Deleted notification successfully');
+                dispatch(notificationList())
+            }
+        })
     }, []);
 
     const handleToggle = useCallback((item) => {
@@ -72,8 +81,30 @@ const NotificationScreen = () => {
         )
     }
 
-    const handleClear = useCallback(() => {
-        console.log('clicked...')
+    const handleDeleteAll = useCallback(() => {
+        if (notification?.response?.length === 0) {
+            setNotifyData((prev) => ({
+                ...prev,
+                openDelSheet: false
+            }))
+            setTimeout(() => {
+                showToast('error', 'No notifications to delete');
+            }, 500)
+            return
+        };
+
+        dispatch(notifyDelAll({ notificationId: 'all' })).then((res) => {
+            if (res?.payload?.status === 200) {
+                setNotifyData((prev) => ({
+                    ...prev,
+                    openDelSheet: false
+                }))
+                setTimeout(() => {
+                    showToast('success', 'Cleared all notifications')
+                    dispatch(notificationList())
+                }, 500)
+            }
+        })
     }, []);
 
     return (
@@ -83,7 +114,12 @@ const NotificationScreen = () => {
                 isBack
                 screenName={'Notifications'}
                 onPressBack={() => navigation.goBack()}
-                onClear={handleClear}
+                onClear={() => {
+                    setNotifyData((prev) => ({
+                        ...prev,
+                        openDelSheet: true
+                    }))
+                }}
             />
 
             {notificationLoading ? (
@@ -118,8 +154,35 @@ const NotificationScreen = () => {
                 )
             )}
 
-
-
+            <BottomSheet
+                visible={notifyData?.openDelSheet}
+                onClose={() =>
+                    setNotifyData((prev) => ({
+                        ...prev,
+                        openDelSheet: false,
+                    }))
+                }
+                height={(height * 0.4) - 50}
+            >
+                <Typo type='h3' title='Delete' />
+                <Typo
+                    type='p'
+                    title={`Are you sure you want to clear all notifications?`}
+                />
+                <View style={{ gap: 15, paddingVertical: 20 }}>
+                    <ButtonComp type='largePrimary' title='Clear all' onPress={handleDeleteAll} />
+                    <ButtonComp
+                        type='largeSecondary'
+                        title='Cancel'
+                        onPress={() =>
+                            setNotifyData((prev) => ({
+                                ...prev,
+                                openDelSheet: false
+                            }))
+                        }
+                    />
+                </View>
+            </BottomSheet>
         </SafeAreaView>
     )
 }

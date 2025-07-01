@@ -9,8 +9,10 @@ import Toast from 'react-native-toast-message';
 import ScreenRoutes from './src/Routes'; //Stack screen
 import { toastConfig } from './toastConfig';
 import { store } from './src/Redux/Store/store';
+import { initializeLogger } from './src/Utils/Helper/logger';
 
 enableScreens();
+initializeLogger();
 
 const App = () => {
   return (

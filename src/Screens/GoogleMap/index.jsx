@@ -122,7 +122,7 @@ const GoogleMapScreen = ({ screen = 'Location' }) => {
                 const formattedAddress = json.results[0].formatted_address;
                 setAddress(formattedAddress);
             } else {
-                setAddress('Address not found');
+                setAddress(json?.error_message);
             }
         } catch (error) {
             console.error('Geocoding error:', error);
@@ -280,3 +280,56 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
     }
 });
+
+
+{/* <GooglePlacesAutocomplete
+  placeholder="Search location"
+  fetchDetails={true}
+  onPress={(data, details = null) => {
+    if (!details?.geometry?.location) return;
+
+    const lat = details.geometry.location.lat;
+    const lng = details.geometry.location.lng;
+
+    const coords = { latitude: lat, longitude: lng };
+    setRegion({
+      ...coords,
+      latitudeDelta: 0.01,
+      longitudeDelta: 0.01,
+    });
+    setMarker(coords);
+    fetchAddressFromCoords(coords);
+  }}
+  query={{
+    key: VITE_GOOGLE_API_KEY || 'YOUR_FALLBACK_API_KEY',
+    language: 'en',
+  }}
+  renderEmptyResult={() => (
+    <View style={{ padding: 10 }}>
+      <Typo title="No places found" style={{ textAlign: 'center', color: 'gray' }} />
+    </View>
+  )}
+  styles={{
+    textInput: {
+      height: 44,
+      borderRadius: 8,
+      borderColor: '#ccc',
+      borderWidth: 1,
+      paddingHorizontal: 10,
+      fontSize: 16,
+    },
+    container: {
+      zIndex: 999,
+      flex: 0,
+    },
+  }}
+  textInputProps={{
+    placeholder: 'Search',
+    returnKeyType: 'search'
+  }}
+  enablePoweredByContainer={false}
+  onFail={(err) => {
+    console.log('Autocomplete Error:', err);
+  }}
+  listViewDisplayed={true}
+/> */}

@@ -3,7 +3,7 @@ import { View, TouchableOpacity, StyleSheet } from 'react-native'
 import Feather from 'react-native-vector-icons/Feather';
 
 import { BackIcon } from '../../Config/ImgConfig'
-import { Typo } from "../../Components"
+import { RefreshButton, Typo } from "../../Components"
 import { ColorPalatte } from '../../Themes';
 
 const SecondaryHeader = ({ isBack, screenName, onPressBack, onRefresh, isClear, onClear }) => {
@@ -20,11 +20,8 @@ const SecondaryHeader = ({ isBack, screenName, onPressBack, onRefresh, isClear, 
                     <Typo type='h3' title={screenName} />
                 )}
             </View>
-            {onRefresh && (
-                <TouchableOpacity onPress={onRefresh}>
-                    <Feather name="refresh-cw" color="#000" size={18} />
-                </TouchableOpacity>
-            )}
+            {onRefresh && <RefreshButton onRefresh={onRefresh} />}
+
             {isClear && (
                 <TouchableOpacity onPress={onClear}>
                     <Typo style={styles.clearAll} title={'Clear All'} />

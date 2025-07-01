@@ -8,7 +8,7 @@ import { ColorPalatte } from '../../Themes'
 import { AddressCard, TimeSlotCart } from './Components'
 import { cartList, cartTimeslot } from '../../Redux/Action/Cart'
 import { PriceDetails } from '../Order/Components'
-import { getISTFullDate } from '../../Utils/CommonFunctions'
+import { getISTFullDate } from '../../Utils/Helper/formatHelper'
 import { orderList, placeOrder } from '../../Redux/Action/Order'
 import { showToast } from '../../Utils/Helper/toastHelper'
 import useUserData from '../../Hooks/useFetchUser'
@@ -106,7 +106,7 @@ const CheckoutScreen = () => {
                     contentContainerStyle={{ paddingVertical: 20, gap: 24, paddingBottom: 100 }}
                     showsVerticalScrollIndicator={false}
                 >
-                    <AddressCard user={user} />
+                    <AddressCard user={user} onChangeAddress={() => navigation.navigate('GoogleMapScreen')} />
                     <View style={{ gap: 5 }}>
                         <Typo type='h5' title={'Slot Date'} />
                         <TimeSlotCart

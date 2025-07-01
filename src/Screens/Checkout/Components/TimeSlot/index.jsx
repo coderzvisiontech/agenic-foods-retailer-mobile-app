@@ -7,7 +7,7 @@ import {
     TouchableOpacity
 } from 'react-native';
 import { ColorPalatte, FontSize } from '../../../../Themes';
-import { getDateData } from '../../../../Utils/CommonFunctions';
+import { getDateData } from '../../../../Utils/Helper/formatHelper';
 
 const TimeSlot = ({ slotTime = [], onSlotDate, onSlotTime }) => {
     const dateData = getDateData();

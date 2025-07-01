@@ -5,9 +5,10 @@ import { useDispatch } from 'react-redux'
 
 import { ColorPalatte, FontSize } from '../../../../Themes'
 import { ButtonComp, OrderCard, SecondaryHeader, StatusTracking, Typo } from '../../../../Components'
-import { orderDetails } from '../../../../Redux/Action/Order'
+import { downloadInvoice, orderDetails } from '../../../../Redux/Action/Order'
 import PriceDetails from '../PriceDetails'
 import { OrderDetailLoader } from '../../../../Loader'
+import { downloadAndOpenFile } from '../DownloadInvoice'
 
 const OrderDetailScreen = ({ route }) => {
     const { id, deliveryStatus } = route.params
@@ -46,11 +47,22 @@ const OrderDetailScreen = ({ route }) => {
         }, [id, dispatch])
     );
 
+    const handleDownloadInvoice = () => {
+        console.log('clicked')
+        dispatch(downloadInvoice({ orderId: id })).then(async (res) => {
+            console.log('res---->', res)
+            if (res?.status === 200) {
+                const fileUrl = res?.payload?.response?.filepath;
+                const fileName = `invoice_${id}.pdf`;
+                await downloadAndOpenFile({ fileUrl, fileName });
+            }
+        })
+    }
 
     return (
         <SafeAreaView style={styles.container}>
             <SecondaryHeader isBack screenName={'Orders'} onPressBack={() => navigation.goBack()} />
-            {orderData.loading ? (
+            {orderData?.loading ? (
                 <OrderDetailLoader />
             ) : (
                 <ScrollView
@@ -96,7 +108,7 @@ const OrderDetailScreen = ({ route }) => {
                 </ScrollView>
             )}
             <View style={styles.invoiceWrapper}>
-                <ButtonComp type='largePrimary' title='Download Invoice' />
+                <ButtonComp onPress={handleDownloadInvoice} type='largePrimary' title='Download Invoice' />
             </View>
         </SafeAreaView>
     )

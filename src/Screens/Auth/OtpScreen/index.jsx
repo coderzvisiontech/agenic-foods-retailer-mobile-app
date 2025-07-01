@@ -21,7 +21,7 @@ import {
 } from '../../../Components';
 import { ColorPalatte, FontSize } from '../../../Themes';
 import { EditIcon, OtpBg } from '../../../Config/ImgConfig';
-import { otpSchema } from '../../../Utils/ValidationSchema';
+import { otpSchema } from '../../../Utils/Helper/ValidationSchema';
 import { showToast } from '../../../Utils/Helper/toastHelper';
 import { useDispatch } from 'react-redux';
 import { authOtpVerify } from '../../../Redux/Action/Auth';

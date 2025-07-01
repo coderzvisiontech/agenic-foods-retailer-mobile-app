@@ -107,8 +107,8 @@ const styles = StyleSheet.create({
         left: 0,
         right: 0,
         backgroundColor: 'white',
-        borderTopLeftRadius: 16,
-        borderTopRightRadius: 16,
+        borderTopLeftRadius: 24,
+        borderTopRightRadius: 24,
         padding: 16,
     },
     handleContainer: {
@@ -128,13 +128,6 @@ const styles = StyleSheet.create({
     },
     scrollContent: {
         flexGrow: 1,
-    },
-    input: {
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 8,
-        padding: 10,
-        marginBottom: 16,
     },
 });
 

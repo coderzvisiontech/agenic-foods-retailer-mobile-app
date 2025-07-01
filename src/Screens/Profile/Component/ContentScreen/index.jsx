@@ -15,7 +15,7 @@ import {
     SecondaryHeader,
     TextInput
 } from '../../../../Components';
-import { ProfileSchema } from '../../../../Utils/ValidationSchema';
+import { ProfileSchema } from '../../../../Utils/Helper/ValidationSchema';
 import CreditCard from '../CreditCard';
 
 const DetailScreen = ({ route }) => {

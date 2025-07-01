@@ -20,7 +20,7 @@ import {
     TextInput,
     StatusBarComp,
 } from '../../../Components';
-import { LoginSchema } from '../../../Utils/ValidationSchema';
+import { LoginSchema } from '../../../Utils/Helper/ValidationSchema';
 import { ColorPalatte } from '../../../Themes';
 import { VegetableImg } from '../../../Config/ImgConfig';
 import { useDispatch } from 'react-redux';

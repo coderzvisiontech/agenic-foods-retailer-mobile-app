@@ -56,3 +56,62 @@ export const notificationDetail = createAsyncThunk(
         }
     }
 );
+
+export const notifySingleDel = createAsyncThunk(
+    "getfresh/notification/single_del",
+    async (dataObject, { rejectWithValue }) => {
+        const token = await AsyncStorage.getItem('token');
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `${token}`,
+                'Cache-Control': 'no-store'
+            },
+            data: dataObject,
+        }
+
+        try {
+            console.log('dataObject', dataObject);
+
+            const response = await axios.delete(`${VITE_API_URL}/notification`, config);
+            return response;
+        } catch (error) {
+            if (error?.response && error?.response?.data) {
+                return rejectWithValue(error?.response?.data);
+            } else {
+                return rejectWithValue({
+                    message: error,
+                });
+            }
+        }
+    }
+);
+
+
+export const notifyDelAll = createAsyncThunk(
+    "getfresh/notification/del_all",
+    async (dataObject, { rejectWithValue }) => {
+        const token = await AsyncStorage.getItem('token');
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `${token}`,
+                'Cache-Control': 'no-store'
+            },
+            data: dataObject,
+        }
+
+        try {
+            const response = await axios.delete(`${VITE_API_URL}/notification`, config);
+            return response;
+        } catch (error) {
+            if (error?.response && error?.response?.data) {
+                return rejectWithValue(error?.response?.data);
+            } else {
+                return rejectWithValue({
+                    message: error,
+                });
+            }
+        }
+    }
+);

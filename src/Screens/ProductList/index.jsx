@@ -5,6 +5,7 @@ import {
     FlatList,
     View,
     Dimensions,
+    ActivityIndicator,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
@@ -17,11 +18,12 @@ import {
     BottomCard,
     Typo
 } from '../../Components';
-import { ColorPalatte } from '../../Themes';
+import { ColorPalatte, FontSize } from '../../Themes';
 import { productList } from '../../Redux/Action/Product';
 import { showToast } from '../../Utils/Helper/toastHelper';
 import { getCartProducts, storeCartProducts } from '../../Hooks/useStoreBulkData';
 import { ListLoader } from '../../Loader';
+import useDoubleBackExit from '../../Hooks/useDoubleBackExit';
 
 const { height } = Dimensions.get('window')
 
@@ -29,37 +31,76 @@ const ProductList = () => {
     const navigation = useNavigation();
     const dispatch = useDispatch();
     const { products, productLoading } = useSelector(state => state.product);
+    useDoubleBackExit();
 
     const [homeData, setHomeData] = useState({
         quantities: {},
         cartCount: 0,
-        searchData: ''
+        searchData: '',
+        canLoadMore: true,
+        productListData: [],
+        isInitialLoad: true,
     })
+
+    const [paginationData, setPaginationData] = useState({
+        limit: 10,
+        start: 0
+    })
+
+    const fetchProduct = useCallback((pagination) => {
+        dispatch(productList({ start: pagination?.start, limit: pagination?.limit }))
+    }, [dispatch])
 
     useFocusEffect(
         useCallback(() => {
-            dispatch(productList());
-        }, [])
+            const initializeScreen = async () => {
+                setHomeData((prev) => ({
+                    ...prev,
+                    productListData: [],
+                    isInitialLoad: true,
+                    canLoadMore: true
+                }))
+
+                const initial = { start: 0, limit: 10 };
+                setPaginationData(initial);
+
+                try {
+                    const existingCart = await getCartProducts();
+                    setHomeData(prev => ({
+                        ...prev,
+                        cartCount: existingCart?.length,
+                    }));
+                } catch (err) {
+                    console.error('Error fetching cart data', err);
+                }
+                fetchProduct(initial);
+            };
+
+            initializeScreen();
+        }, [fetchProduct])
     );
 
     useEffect(() => {
-        const unsubscribe = navigation.addListener('focus', async () => {
-            try {
-                const existingCart = await getCartProducts();
-                setHomeData(prev => ({
-                    ...prev,
-                    cartCount: existingCart?.length,
-                }));
-            } catch (err) {
-                console.error('Error fetching cart data', err);
-            }
-        });
+        if (products?.response?.document) {
+            const newItems = products?.response?.document;
 
-        return unsubscribe;
-    }, []);
+            setHomeData(prev => {
+                const allItems = [...prev.productListData, ...newItems];
+                const uniqueItems = Array?.from(new Map(allItems?.map(item => [item?.id, item])).values());
+                console.log('uniqueItems', uniqueItems)
+
+                return {
+                    ...prev,
+                    isInitialLoad: false,
+                    productListData: uniqueItems,
+                    canLoadMore: newItems?.length >= paginationData?.limit,
+                };
+            });
+        }
+    }, [products, paginationData?.limit]);
 
     const mappedProducts = useMemo(() => {
-        const allProducts = products?.response?.document || [];
+        const allProducts = homeData.productListData;
         const searchLower = homeData?.searchData?.toLowerCase()?.trim();
 
         const filtered = allProducts.filter((item) => {
@@ -74,7 +115,7 @@ const ProductList = () => {
             quantity: homeData?.quantities?.[item?.id],
             items_left: item?.quantity,
         }));
-    }, [products, homeData?.quantities, homeData?.searchData]);
+    }, [homeData?.productListData, homeData?.quantities, homeData?.searchData]);
 
 
     const counts = useMemo(() => ({
@@ -97,7 +138,7 @@ const ProductList = () => {
     const handleCheckout = async () => {
         try {
             const existingCart = await getCartProducts();
-            setHomeData((prev) => ({ ...prev, cartCount: existingCart }))
+            setHomeData((prev) => ({ ...prev, cartCount: existingCart?.length }))
             const cartMap = new Map();
 
             existingCart?.forEach(item => {
@@ -128,12 +169,10 @@ const ProductList = () => {
     };
 
     const renderItem = useCallback(({ item }) => (
-        <>
-            <ProductCard
-                data={item}
-                onQuantityChange={handleQuantityChange}
-            />
-        </>
+        <ProductCard
+            data={item}
+            onQuantityChange={handleQuantityChange}
+        />
     ), [handleQuantityChange]);
 
     const renderAddCart = useMemo(() => {
@@ -143,10 +182,24 @@ const ProductList = () => {
                     items={cartItems}
                     onPress={handleCheckout}
                     bottom={75}
+                    isAlign
                 />
             )
         );
     }, [cartItems, handleCheckout]);
+
+    const handleLoadMore = useCallback(() => {
+        if (!homeData.canLoadMore || productLoading) {
+            return;
+        }
+
+        const newStart = paginationData.start + paginationData.limit;
+        const newPaginationData = { ...paginationData, start: newStart };
+
+        setPaginationData(newPaginationData);
+        setHomeData(prev => ({ ...prev, canLoadMore: false }));
+        fetchProduct(newPaginationData);
+    }, [fetchProduct, paginationData, homeData.canLoadMore, productLoading]);
 
     return (
         <SafeAreaView style={styles.container}>
@@ -179,7 +232,7 @@ const ProductList = () => {
                     />
                 )}
 
-                {productLoading ? (
+                {productLoading && homeData?.isInitialLoad ? (
                     <ListLoader />
                 ) : (
                     <FlatList
@@ -188,8 +241,22 @@ const ProductList = () => {
                         renderItem={renderItem}
                         showsVerticalScrollIndicator={false}
                         contentContainerStyle={{
-                            paddingBottom: cartItems?.length > 0 ? 150 : 60
+                            paddingBottom: cartItems?.length > 0 ? 150 : !homeData?.isInitialLoad && productLoading ? 100 : 60
                         }}
+                        onEndReachedThreshold={0.5}
+                        onEndReached={() => {
+                            if (!homeData.isInitialLoad && homeData.canLoadMore && !productLoading) {
+                                handleLoadMore();
+                            }
+                        }}
+                        ListFooterComponent={
+                            !homeData.isInitialLoad && productLoading ? (
+                                <View style={{ alignItems: 'center', paddingVertical: 20, gap: 10 }}>
+                                    <Typo style={{ fontSize: FontSize.fontSize12, color: ColorPalatte.grey_400 }} title={'Loading...'} />
+                                    <ActivityIndicator color={{ color: ColorPalatte.grey_400 }} />
+                                </View>
+                            ) : null
+                        }
                     />
                 )}
 
