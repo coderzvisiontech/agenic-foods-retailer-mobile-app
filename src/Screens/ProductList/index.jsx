@@ -87,8 +87,6 @@ const ProductList = () => {
             setHomeData(prev => {
                 const allItems = [...prev.productListData, ...newItems];
                 const uniqueItems = Array?.from(new Map(allItems?.map(item => [item?.id, item])).values());
-                console.log('uniqueItems', uniqueItems)
-
                 return {
                     ...prev,
                     isInitialLoad: false,
@@ -116,7 +114,6 @@ const ProductList = () => {
             items_left: item?.quantity,
         }));
     }, [homeData?.productListData, homeData?.quantities, homeData?.searchData]);
-
 
     const counts = useMemo(() => ({
         cartCount: products?.cartCount,
@@ -225,7 +222,7 @@ const ProductList = () => {
                     }
                 />
 
-                {!productLoading && mappedProducts?.length === 0 && (
+                {!homeData?.isInitialLoad && !productLoading && mappedProducts?.length === 0 && (
                     <Typo
                         style={{ textAlign: 'center', justifyContent: 'center', alignItems: 'center', top: height * 0.35 }}
                         title="No products match your search."

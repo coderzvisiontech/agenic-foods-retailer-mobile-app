@@ -18,6 +18,7 @@ import StatusTracking from "./StatusTracking";
 import RadioButton from "./RadioButton";
 import NotificationCard from "./NotificationCard";
 import RefreshButton from "./RefreshButton";
+import SearchDropdown from "./AutocompleteDropDown";
 
 
 export {
@@ -40,5 +41,6 @@ export {
     StatusTracking,
     RadioButton,
     NotificationCard,
-    RefreshButton
+    RefreshButton,
+    SearchDropdown
 }

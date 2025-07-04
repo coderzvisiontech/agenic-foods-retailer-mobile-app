@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { FlatList, SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, FlatList, SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 
 import { ButtonComp, OrderCard, SecondaryHeader, TextInput, Typo } from '../../Components';
@@ -20,7 +20,8 @@ const OrderDeatils = ({ route }) => {
         canLoadMore: true,
         orderListData: [],
         isInitialLoad: true,
-        searchData: ''
+        searchData: '',
+        paginationLoad: false
     })
     const fetchOrders = useCallback((pagination) => {
         dispatch(orderList({ start: pagination.start, limit: pagination.limit }));
@@ -49,18 +50,16 @@ const OrderDeatils = ({ route }) => {
                     ...prev,
                     isInitialLoad: false,
                     orderListData: uniqueItems,
+                    canLoadMore: newItems?.length >= pagination?.limit
                 };
             });
 
-            if (newItems?.length < pagination?.limit) {
-                setPageData((prev) => ({
-                    ...prev,
-                    canLoadMore: false
-                }))
-            }
+            setPageData((prev) => ({
+                ...prev,
+                paginationLoad: false
+            }))
         }
     }, [order]);
-
 
     useEffect(() => {
         const unsubscribe = navigation.addListener('beforeRemove', (e) => {
@@ -104,6 +103,10 @@ const OrderDeatils = ({ route }) => {
     }, [navigation]);
 
     const handleLoadMore = useCallback(() => {
+        setPageData((prev) => ({
+            ...prev,
+            paginationLoad: true
+        }))
         setPagination(prev => {
             const updated = { ...prev, start: prev?.start + prev?.limit };
             fetchOrders(updated);
@@ -153,6 +156,15 @@ const OrderDeatils = ({ route }) => {
                                 canLoadMore: true,
                             }))
                         }
+                        ListFooterComponent={
+                            pageData?.paginationLoad ? (
+                                <View style={{ alignItems: 'center', paddingVertical: 20, gap: 10 }}>
+                                    <Typo style={{ fontSize: FontSize.fontSize12, color: ColorPalatte.grey_400 }} title={'Loading...'} />
+                                    <ActivityIndicator color={{ color: ColorPalatte.grey_400 }} />
+                                </View>
+                            ) : null
+                        }
+
                     />
                 ) : pageData?.searchData?.trim() ? (
                     <View style={styles.emptyContainer}>

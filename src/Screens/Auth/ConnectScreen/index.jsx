@@ -11,7 +11,7 @@ const { width } = Dimensions.get('window')
 
 const ConnectScreen = () => {
     const navigation = useNavigation();
-    
+
     return (
         <SafeAreaView style={styles.container}>
             <StatusBarComp backgroundColor={ColorPalatte.whiteClr} visible={true} />
@@ -24,10 +24,15 @@ const ConnectScreen = () => {
                     }}
                     resizeMode='center'
                 />
-                <Typo style={styles.header} type='h1' title='From Farm to Your Doorstep' />
-                <Typo style={styles.header} title='View fresh produce, check quantities, and make quick, easy payments instantly.' />
-                <BasketImg />
-                <ButtonComp style={{ marginTop: 40 }} type='largePrimary' title='Connect With Phone Number' onPress={() => navigation.navigate('LoginScreen')} />
+                <View style={{ gap: 15 }}>
+                    <Typo style={{ textAlign: 'center' }} type='h1' title='From Farm to Your Doorstep' />
+                    <Typo style={{ textAlign: 'center', }} title='View fresh produce, check quantities, and make quick, easy payments instantly.' />
+                </View>
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                    <BasketImg />
+                </View>
+
+                <ButtonComp style={{ marginBottom: 20 }} type='largePrimary' title='Connect With Phone Number' onPress={() => navigation.navigate('LoginScreen')} />
             </View>
         </SafeAreaView>
     )
@@ -39,13 +44,10 @@ const styles = StyleSheet.create({
         backgroundColor: ColorPalatte.whiteClr,
     },
     bodyWrapper: {
+        flex: 1,
         padding: 20,
         alignItems: 'center',
-
-    },
-    header: {
-        textAlign: 'center',
-        marginVertical: 5
+        justifyContent: 'space-between ',
     },
 })
 

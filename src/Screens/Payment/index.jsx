@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { SafeAreaView, StyleSheet, View, ScrollView } from 'react-native'
 import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import { useDispatch } from 'react-redux'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { ColorPalatte } from '../../Themes'
 import { ButtonComp, SecondaryHeader, Typo } from '../../Components'
@@ -64,12 +65,18 @@ const PaymentScreen = ({ route }) => {
             orderId: data?.orderId
         }
 
-        dispatch(proceedPayment(payload)).then((res) => {
+        dispatch(proceedPayment(payload)).then(async (res) => {
             if (res?.payload.status === 200) {
-                navigation.navigate('SuccessScreen', {
-                    message: 'Successfully Order Placed',
-                    is_from: is_from
-                })
+                try {
+                    await AsyncStorage.removeItem('@products');
+                    console.log('Products removed from local storage');
+                    navigation.navigate('SuccessScreen', {
+                        message: 'Successfully Order Placed',
+                        is_from: is_from
+                    })
+                } catch (e) {
+                    console.error('Error removing @products:', e);
+                }
             }
         })
     }, [data, paymentData])

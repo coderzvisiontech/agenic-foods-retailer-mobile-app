@@ -6,7 +6,9 @@ export const RegisterSchema = Yup.object().shape({
     shop_name: Yup.string().required('Shop Name is required'),
     email: Yup.string().email('Invalid email').required('Email is required'),
     number: Yup.string().min(10, 'Invalid mobile number').required('Mobile number is required'),
-    // address: Yup.string().required('Address is required'),
+    address: Yup.object().shape({
+        availability_address: Yup.string().required('Address is required'),
+    }),
     document: Yup.object().shape({
         uri: Yup.string().required('Document is required'),
         fileName: Yup.string(),

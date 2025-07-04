@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { SafeAreaView, StyleSheet, View, ScrollView } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { useFocusEffect, useNavigation } from '@react-navigation/native'
@@ -17,13 +17,32 @@ const CheckoutScreen = () => {
     const navigation = useNavigation();
     const dispatch = useDispatch();
     const { cart } = useSelector(state => state.cart);
-    const { user } = useUserData();
+    const { user: initialUser } = useUserData();
 
     const [checkoutData, setCheckoutData] = useState({
         timeSlot: [],
         selectedSlot: [],
-        sheduledate: ''
+        sheduledate: '',
+        user: {
+            name: '',
+            email: '',
+            token: '',
+            user_id: '',
+            phone_number: '',
+            address: {},
+            location: {},
+            availability_address: '',
+        },
     })
+
+    useEffect(() => {
+        if (initialUser && initialUser?.user_id) {
+            setCheckoutData(prev => ({
+                ...prev,
+                user: initialUser,
+            }));
+        }
+    }, [initialUser]);
 
     useFocusEffect(
         useCallback(() => {
@@ -65,10 +84,10 @@ const CheckoutScreen = () => {
             sub_total: cart?.total,
             grand_total: cart?.total,
             delivery_charges: cart?.delivery_charges,
-            location: user?.location,
+            location: checkoutData?.user?.location,
             sheduledate: checkoutData?.sheduledate,
-            address: user?.address,
-            availability_address: user?.availability_address
+            address: checkoutData?.user?.address,
+            availability_address: checkoutData?.user?.availability_address,
         }
         if (!checkoutData?.selectedSlot?.starttime && !checkoutData?.selectedSlot?.endtime && !checkoutData?.sheduledate) {
             showToast('error', 'Please select Slot Date for delivery');
@@ -106,7 +125,24 @@ const CheckoutScreen = () => {
                     contentContainerStyle={{ paddingVertical: 20, gap: 24, paddingBottom: 100 }}
                     showsVerticalScrollIndicator={false}
                 >
-                    <AddressCard user={user} onChangeAddress={() => navigation.navigate('GoogleMapScreen')} />
+                    <AddressCard
+                        user={checkoutData?.user}
+                        onChangeAddress={() => {
+                            navigation.navigate('GoogleMapScreen', {
+                                onSelect: ({ location, address }) => {
+                                    setCheckoutData(prev => ({
+                                        ...prev,
+                                        user: {
+                                            ...prev.user,
+                                            location,
+                                            address,
+                                            availability_address: address?.availability_address || '',
+                                        },
+                                    }));
+                                },
+                            });
+                        }}
+                    />
                     <View style={{ gap: 5 }}>
                         <Typo type='h5' title={'Slot Date'} />
                         <TimeSlotCart

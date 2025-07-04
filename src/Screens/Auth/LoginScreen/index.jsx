@@ -30,9 +30,10 @@ import { getAuthToken } from '../../../Utils/Helper/checkAuth';
 
 const { height, width } = Dimensions.get('window');
 
-const LoginScreen = () => {
+const LoginScreen = ({ route }) => {
     const navigation = useNavigation();
     const dispatch = useDispatch()
+    const { is_from } = route.params || {}
     const [loginData, setLoginData] = useState({
         infoState: {
             loading: false
@@ -51,7 +52,6 @@ const LoginScreen = () => {
         checkUser();
     }, []);
 
-
     const formik = useFormik({
         initialValues: {
             phone: ''
@@ -59,41 +59,53 @@ const LoginScreen = () => {
         validationSchema: LoginSchema,
         onSubmit: (values) => {
             Keyboard.dismiss()
-            setLoginData((prev) => ({
+            setLoginData(prev => ({
                 ...prev,
-                infoState: { loading: true }
-            }))
+                infoState: {
+                    ...prev.infoState,
+                    loading: true
+                }
+            }));
+
             dispatch(authLogin({ phone: { code: "+91", number: values?.phone } })).then((res) => {
                 console.log('res', res)
                 if (res?.payload?.data?.status === 0) {
-                    setLoginData((prev) => ({
+                    setLoginData(prev => ({
                         ...prev,
-                        infoState: { loading: false }
-                    }))
+                        infoState: {
+                            ...prev.infoState,
+                            loading: false
+                        }
+                    }));
                     showToast('success', 'Please register to login');
                     setTimeout(() => {
                         navigation.navigate("RegisterScreen", { phone_number: values?.phone })
                     }, 1500)
                 } else if (res?.payload?.data?.status === 1) {
-                    setLoginData((prev) => ({
+                    setLoginData(prev => ({
                         ...prev,
-                        infoState: { loading: false }
-                    }))
+                        infoState: {
+                            ...prev.infoState,
+                            loading: false
+                        }
+                    }));
                     AsyncStorage.setItem('credit_points', res?.payload?.data?.general?.credits)
                     showToast('success', 'OTP Sent Successfully');
                     setTimeout(() => {
-                        navigation.navigate("OtpScreen", { phone: values?.phone })
+                        navigation.navigate("OtpScreen", { phone: values?.phone, is_from: is_from || '', otp: res?.payload?.data.otp })
                     }, 1500)
                 }
                 else {
-                    setLoginData((prev) => ({
+                    setLoginData(prev => ({
                         ...prev,
-                        infoState: { loading: false }
-                    }))
+                        infoState: {
+                            ...prev.infoState,
+                            loading: false
+                        }
+                    }));
                     showToast('error', 'Something went wrong');
                 }
             })
-
         },
     });
 
@@ -110,7 +122,7 @@ const LoginScreen = () => {
                         keyboardShouldPersistTaps="handled"
                     >
                         <BackgroundWrapper
-                            height={420}
+                            height={450}
                             image={
                                 <VegetableImg
                                     preserveAspectRatio="xMidYMid meet"
@@ -120,22 +132,25 @@ const LoginScreen = () => {
                             }
                             alignBg
                         >
-                            <View style={{ justifyContent: "space-between", height: 275, flex: 1 }}>
-                                <View style={{ alignItems: 'center', paddingVertical: 20 }}>
-                                    <Typo type='h2' title='Welcome to Get Fresh' />
-                                    <Typo type='p' title='Enter your phone number' />
-                                </View>
+                            <View style={{ justifyContent: "space-between", flex: 1, paddingVertical: 40, gap: formik.errors.phone ? 10 : 30 }}>
+                                <View style={{ gap: 30 }}>
+                                    <View style={{ alignItems: 'center' }}>
+                                        <Typo type='h2' title='Welcome to Get Fresh' />
+                                        <Typo type='p' title='Enter your phone number' />
+                                    </View>
 
-                                <TextInput
-                                    label="Mobile Number"
-                                    placeholder="Enter Mobile Number"
-                                    keyboardType="phone-pad"
-                                    type='phonenumber'
-                                    onChangeText={formik.handleChange('phone')}
-                                    onBlur={formik.handleBlur('phone')}
-                                    value={formik.values.phone}
-                                    error={formik.touched.phone && formik.errors.phone}
-                                />
+                                    <TextInput
+                                        label="Mobile Number"
+                                        placeholder="Enter Mobile Number"
+                                        keyboardType="phone-pad"
+                                        type='phonenumber'
+                                        onChangeText={formik.handleChange('phone')}
+                                        onBlur={formik.handleBlur('phone')}
+                                        value={formik.values.phone}
+                                        error={formik.touched.phone && formik.errors.phone}
+                                        isMandatory
+                                    />
+                                </View>
 
                                 <ButtonComp
                                     title="Log In"
@@ -143,6 +158,7 @@ const LoginScreen = () => {
                                     onPress={formik.handleSubmit}
                                     disable={loginData?.loading}
                                 />
+
                             </View>
                         </BackgroundWrapper>
                     </ScrollView>

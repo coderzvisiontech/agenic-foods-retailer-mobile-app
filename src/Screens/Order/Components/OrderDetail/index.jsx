@@ -24,6 +24,7 @@ const OrderDetailScreen = ({ route }) => {
             setOrderDetails((prev) => ({ ...prev, loading: true }))
             dispatch(orderDetails({ id: id })).then((res) => {
                 if (res?.payload?.status === 200) {
+                    console.log('res?.payload',res?.payload)
                     const data = res?.payload?.data?.response?.map((el) => ({
                         delivery_address: el?.delivery_address,
                         delivery_charges: el?.delivery_charges,
@@ -48,7 +49,6 @@ const OrderDetailScreen = ({ route }) => {
     );
 
     const handleDownloadInvoice = () => {
-        console.log('clicked')
         dispatch(downloadInvoice({ orderId: id })).then(async (res) => {
             console.log('res---->', res)
             if (res?.status === 200) {

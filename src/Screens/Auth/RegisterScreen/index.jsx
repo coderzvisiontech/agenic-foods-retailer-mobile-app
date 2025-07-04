@@ -43,15 +43,23 @@ const RegisterScreen = ({ route }) => {
             email: '',
             number: phone_number,
             shop_name: '',
-            address: '',
+            address: {
+                line1: '',
+                line2: '',
+                city: '',
+                state: '',
+                zipcode: '',
+                country: '',
+                availability_address: ''
+            },
             document: '', //file1
             shop_images: '', //file2
             lng: '',
             lat: "",
+
         },
         validationSchema: RegisterSchema,
         onSubmit: (values) => {
-            console.log('values', values)
             const payload = {
                 first_name: values?.first_name,
                 last_name: values?.last_name,
@@ -59,17 +67,17 @@ const RegisterScreen = ({ route }) => {
                 code: '+91',
                 number: values?.number,
                 shop_name: values?.shop_name,
-                line1: '6th avenue',
-                line2: 'Anna nagar',
-                city: 'Chennai',
-                state: 'Tamil Nadu',
-                zipcode: '600040',
-                country: 'India',
-                lat: '12.989',
-                lng: '8.9787',
+                line1: values?.address?.line1,
+                line2: values?.address?.line2,
+                city: values?.address?.city,
+                state: values?.address?.state,
+                zipcode: values?.address?.zipcode,
+                country: values?.address?.country,
+                lat: values?.lat,
+                lng: values?.lng,
                 file1: values?.document,
                 file2: values?.shop_images,
-            }
+            };
             setRegisterData((prev) => ({
                 ...prev,
                 infoState: { loading: true }
@@ -78,7 +86,6 @@ const RegisterScreen = ({ route }) => {
                 console.log('res', res)
                 if (res?.payload?.data?.status) {
                     showToast('success', 'Registration Successfull');
-                    console.log('values', values)
                     dispatch(authLogin({ phone: { code: "+91", number: values?.number } })).then((res) => {
                         console.log('res', res);
                         if (res?.payload?.status === 200) {
@@ -88,21 +95,10 @@ const RegisterScreen = ({ route }) => {
                             }))
                             showToast('success', 'OTP sent successfully.')
                             setTimeout(() => {
-                                navigation.navigate('OtpScreen', { phone: values?.number, isFrom: 'Register' });
+                                navigation.navigate('OtpScreen', { phone: values?.number, is_from: 'Register', otp: res?.payload?.data?.otp });
                             }, 1000)
                         }
                     })
-                    // setTimeout(() => {
-                    //     // navigation.navigate('SuccessScreen', {
-                    //     //     message: 'Successfully Created a Account',
-                    //     //     screenRoute: {
-                    //     //         routeName: 'BottomTab',
-                    //     //         params: { screen: 'loginScreen' }
-                    //     //     }
-                    //     // });
-                    //     navigation.navigate('OtpScreen', { phone: values?.number });
-
-                    // }, 1500)
                 } else if (res?.payload?.data?.isExist) {
                     showToast('error', res?.payload?.data?.message);
                     setRegisterData((prev) => ({
@@ -137,8 +133,8 @@ const RegisterScreen = ({ route }) => {
                                 placeholder="Enter First Name"
                                 onChangeText={formik.handleChange('first_name')}
                                 onBlur={formik.handleBlur('first_name')}
-                                value={formik.values.first_name}
-                                error={formik.touched.first_name && formik.errors.first_name}
+                                value={formik?.values?.first_name}
+                                error={formik?.touched?.first_name && formik?.errors?.first_name}
                                 isMandatory
                             />
                             <TextInput
@@ -146,8 +142,8 @@ const RegisterScreen = ({ route }) => {
                                 placeholder="Enter Last Name"
                                 onChangeText={formik.handleChange('last_name')}
                                 onBlur={formik.handleBlur('last_name')}
-                                value={formik.values.last_name}
-                                error={formik.touched.last_name && formik.errors.last_name}
+                                value={formik?.values?.last_name}
+                                error={formik?.touched?.last_name && formik?.errors?.last_name}
                                 isMandatory
                             />
                             <TextInput
@@ -156,8 +152,8 @@ const RegisterScreen = ({ route }) => {
                                 keyboardType="email-address"
                                 onChangeText={formik.handleChange('email')}
                                 onBlur={formik.handleBlur('email')}
-                                value={formik.values.email}
-                                error={formik.touched.email && formik.errors.email}
+                                value={formik?.values?.email}
+                                error={formik?.touched?.email && formik?.errors?.email}
                                 isMandatory
                             />
                             <TextInput
@@ -165,8 +161,8 @@ const RegisterScreen = ({ route }) => {
                                 placeholder="Enter Shop Name"
                                 onChangeText={formik.handleChange('shop_name')}
                                 onBlur={formik.handleBlur('shop_name')}
-                                value={formik.values.shop_name}
-                                error={formik.touched.shop_name && formik.errors.shop_name}
+                                value={formik?.values?.shop_name}
+                                error={formik?.touched?.shop_name && formik?.errors?.shop_name}
                                 isMandatory
                             />
                             <TextInput
@@ -175,21 +171,35 @@ const RegisterScreen = ({ route }) => {
                                 keyboardType="phone-pad"
                                 onChangeText={formik.handleChange('number')}
                                 onBlur={formik.handleBlur('number')}
-                                value={formik.values.number}
+                                value={formik?.values?.number}
                                 type='phonenumber'
-                                error={formik.touched.number && formik.errors.number}
+                                error={formik?.touched?.number && formik?.errors?.number}
                                 isMandatory
                             />
                             <TextInput
                                 label="Address"
                                 placeholder="Enter Address"
-                                onChangeText={formik.handleChange('address')}
-                                onBlur={formik.handleBlur('address')}
-                                value={formik.values.address}
-                                error={formik.touched.address && formik.errors.address}
-                                isMandatory
+                                value={formik?.values?.address?.availability_address}
                                 editable={false}
-                                onPressIn={() => navigation.navigate('GoogleMapScreen')}
+                                isMandatory
+                                error={
+                                    formik?.touched?.address?.availability_address && formik?.errors?.address?.availability_address
+                                }
+                                onPressIn={() => {
+                                    navigation.navigate('GoogleMapScreen', {
+                                        onSelect: ({ address }) => {
+                                            formik.setFieldValue('address.availability_address', address?.availability_address || '')
+                                            formik.setFieldValue('address.line1', address?.line1 || '');
+                                            formik.setFieldValue('address.line2', address?.line2 || '');
+                                            formik.setFieldValue('address.city', address?.city || '');
+                                            formik.setFieldValue('address.state', address?.state || '');
+                                            formik.setFieldValue('address.country', address?.country || '');
+                                            formik.setFieldValue('address.zipcode', address?.zipcode || '');
+                                            formik.setFieldValue('lat', address?.lat || '');
+                                            formik.setFieldValue('lng', address?.lng || '');
+                                        },
+                                    });
+                                }}
                             />
                             <TextInput
                                 label="Upload a Document"
@@ -203,8 +213,8 @@ const RegisterScreen = ({ route }) => {
                                     })
                                 }}
                                 onBlur={formik.handleBlur('document')}
-                                value={formik.values.document?.fileName}
-                                error={formik.touched.document && formik.errors.document?.uri}
+                                value={formik?.values?.document?.fileName}
+                                error={formik?.touched?.document && formik?.errors?.document?.uri}
                                 isMandatory
                             />
                             <TextInput
@@ -218,19 +228,21 @@ const RegisterScreen = ({ route }) => {
                                         type: file?.type,
                                     })
                                 }}
-                                value={formik.values.shop_images?.fileName}
+                                value={formik?.values?.shop_images?.fileName}
                                 selectionLimit={5}
                             />
 
-                            <ButtonComp
-                                title="Create an Account"
-                                type="largePrimary"
-                                onPress={formik.handleSubmit}
-                                disable={registerData?.infoState?.loading}
-                            />
                         </View>
                     </ScrollView>
                 </TouchableWithoutFeedback>
+                <View style={{ position: 'absolute', bottom: 20, width: '100%' }}>
+                    <ButtonComp
+                        title="Create an Account"
+                        type="largePrimary"
+                        onPress={formik.handleSubmit}
+                        disable={registerData?.infoState?.loading}
+                    />
+                </View>
             </KeyboardAvoidingView>
         </SafeAreaView>
     );
@@ -244,7 +256,7 @@ const styles = StyleSheet.create({
         paddingTop: 24
     },
     scrollContent: {
-        paddingBottom: 20,
+        paddingBottom: 60,
     },
     formWrapper: {
         marginTop: 20,

@@ -55,7 +55,7 @@ const OrderCard = ({ data, onOrderPress, isOrder = true }) => {
                     <Typo ellipsis={true} tailWidth={180} style={{ fontSize: FontSize.fontSize18, fontFamily: 'Outfit-Medium' }} title={data?.cartDetail?.length > 1 ? formatList(data?.cartDetail?.map((el) => el?.product)) : data?.cartDetail?.[0]?.product} />
                 )}
                 {isOrder ? (
-                    <Typo tailWidth={170} ellipsis={true} style={styles.orderName} title={data?.productDetail?.length > 1 ? `${data?.productDetail?.[0]} +${data?.productDetail?.length - 1}` : data?.productDetail} />
+                    <Typo tailWidth={170} ellipsis={false} style={styles.orderName} title={data?.productDetail?.length > 1 ? `${data?.productDetail?.[0]} +${data?.productDetail?.length - 1}` : data?.productDetail} />
                 ) : (
                     <Typo style={styles.orderQty} title={`Qty: ${data?.cartDetail?.length}`} />
                 )}

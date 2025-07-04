@@ -32,7 +32,7 @@ const { height, width } = Dimensions.get('window');
 const OtpScreen = ({ route }) => {
     const navigation = useNavigation();
     const dispatch = useDispatch();
-    const { phone, isFrom } = route.params;
+    const { phone, is_from, otp } = route.params;
 
     const [otpData, setOtpData] = useState({
         infoData: {
@@ -42,7 +42,7 @@ const OtpScreen = ({ route }) => {
 
     const formik = useFormik({
         initialValues: {
-            otp: '',
+            otp: otp,
             terms: false
         },
         validationSchema: otpSchema,
@@ -53,23 +53,28 @@ const OtpScreen = ({ route }) => {
                     code: '+91',
                     number: phone
                 },
-                otp: values?.otp,
+                otp: values?.otp?.toString(),
             }
             setOtpData((prev) => ({
                 ...prev,
-                infoData: { loading: true }
-            }))
+                infoData: {
+                    ...prev.infoData,
+                    loading: true
+                }
+            }));
             dispatch(authOtpVerify(payload)).then(async (res) => {
                 if (res?.payload?.status === 200) {
                     showToast('success', 'OTP verified successfully');
                     setOtpData((prev) => ({
                         ...prev,
-                        infoData: { loading: false }
-                    }))
+                        infoData: {
+                            ...prev.infoData,
+                            loading: false
+                        }
+                    }));
                     await AsyncStorage.setItem('token', res?.payload?.data?.token);
                     dispatch(userProfile()).then(async (res) => {
                         console.log('res', res);
-
                         if (res?.payload?.status === 200) {
                             await AsyncStorage.setItem('email', res?.payload?.data?.response?.[0]?.email || '')
                             await AsyncStorage.setItem('full_name', `${res?.payload?.data?.response?.[0]?.first_name || ''} ${res?.payload?.data?.response?.[0]?.last_name || ''}`)
@@ -80,19 +85,18 @@ const OtpScreen = ({ route }) => {
                                 'location',
                                 JSON.stringify(res?.payload?.data?.response?.[0]?.location || {})
                             );
-
                             await AsyncStorage.setItem(
                                 'address',
                                 JSON.stringify(res?.payload?.data?.response?.[0]?.address || {})
                             );
-
-                            if (isFrom === 'Register') {
+                            if (is_from === 'Register') {
                                 setTimeout(() => {
                                     navigation.navigate('SuccessScreen', {
                                         screenRoute: {
                                             routeName: 'BottomTab',
-                                            params: { screen: 'Home', message: 'Successfully Created a Account' }
-                                        }
+                                            params: { screen: 'Home' },
+                                        },
+                                        message: 'Successfully Created a Account'
                                     });
                                 }, 1500)
                             } else {
@@ -100,7 +104,6 @@ const OtpScreen = ({ route }) => {
                                     navigation.navigate('BottomTab', { screen: 'Home' })
                                 }, 1500)
                             }
-
                         } else {
                             showToast('error', 'Something went wrong')
                         }
@@ -108,8 +111,11 @@ const OtpScreen = ({ route }) => {
                 } else {
                     setOtpData((prev) => ({
                         ...prev,
-                        infoData: { loading: false }
-                    }))
+                        infoData: {
+                            ...prev.infoData,
+                            loading: false
+                        }
+                    }));
                     showToast('error', res?.payload?.message)
                 }
             })
@@ -144,9 +150,12 @@ const OtpScreen = ({ route }) => {
                             </TouchableOpacity>
                         </View>
                     </View>
-
                     <View style={{ paddingVertical: 30, alignItems: 'center', gap: 10, paddingBottom: Object.keys(formik.errors).length > 0 ? 15 : 40 }}>
-                        <OTPInput length={6} value={formik.values.otp} setValue={formik.handleChange('otp')} />
+                        <OTPInput
+                            length={6}
+                            value={formik.values.otp?.toString() || ''}
+                            setValue={(val) => formik.setFieldValue('otp', val)}
+                        />
                         {(formik.errors.otp || formik.errors.terms) && (
                             <Typo
                                 style={styles.error}
